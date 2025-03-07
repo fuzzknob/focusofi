@@ -53,6 +53,7 @@ export async function endBreak(body: {
 }
 
 export async function stopTimer(body: {
+  endTime: Date
   totalWorkTime: number
   totalBreakTime: number
 }) {

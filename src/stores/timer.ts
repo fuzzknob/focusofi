@@ -116,6 +116,7 @@ export const useTimerStore = defineStore('timer', {
       if (user.value) {
         const { report } = this
         await stopTimer({
+          endTime: new Date(),
           totalBreakTime: report.totalBreakTaken,
           totalWorkTime: report.totalWorked,
         })

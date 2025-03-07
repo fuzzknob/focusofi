@@ -29,6 +29,13 @@
       "when": 1741234768482,
       "tag": "0003_past_fixer",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1741363016485,
+      "tag": "0004_loose_stone_men",
+      "breakpoints": true
     }
   ]
 }

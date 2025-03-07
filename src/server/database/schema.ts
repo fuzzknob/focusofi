@@ -29,6 +29,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   sessions: many(sessions),
   settings: one(settings),
   timers: one(timers),
+  histories: many(histories),
 }))
 
 // email_otps table
@@ -96,6 +97,24 @@ export const timers = sqliteTable('timers', {
 export const timersRelations = relations(timers, ({ one }) => ({
   user: one(users, {
     fields: [timers.userId],
+    references: [users.id],
+  }),
+}))
+
+// history table
+export const histories = sqliteTable('histories', {
+  ...basicColumns,
+  startTime: integer('start_time', { mode: 'timestamp_ms' }).notNull(),
+  endTime: integer('end_time', { mode: 'timestamp_ms' }).notNull(),
+  totalWorkTime: integer('total_work_time').notNull(),
+  totalBreakTime: integer('total_break_time').notNull(),
+  name: text('name'),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+})
+
+export const historiesRelations = relations(histories, ({ one }) => ({
+  user: one(users, {
+    fields: [histories.userId],
     references: [users.id],
   }),
 }))

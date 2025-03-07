@@ -3,6 +3,7 @@ import { tables, useDrizzle } from '~/server/services/drizzle'
 import { type User, TimerStatus } from '~/types/types'
 
 const stopTimerSchema = z.object({
+  endTime: z.coerce.date(),
   totalWorkTime: z.number(),
   totalBreakTime: z.number(),
 })
@@ -37,6 +38,13 @@ export default defineEventHandler(async (event) => {
     breakTillStatusChange: data.totalBreakTime,
   })
   // TODO: send websocket event
+  await db.insert(tables.histories).values({
+    startTime: timer.timerStartedAt,
+    endTime: data.endTime,
+    totalWorkTime: data.totalWorkTime,
+    totalBreakTime: data.totalBreakTime,
+    userId: user.id,
+  })
   return {
     message: 'Stopped Timer',
   }
