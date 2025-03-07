@@ -2,6 +2,7 @@ import { useSecureSession } from '../libs/secure_session'
 import { useDrizzle, eq, tables } from '../services/drizzle'
 
 export default defineEventHandler(async (event) => {
+  if (!useRuntimeConfig(event).cookiePassword) return
   const h3session = await useSecureSession(event)
   const authorization = h3session.data.authorization as string | undefined
   if (!authorization) {
