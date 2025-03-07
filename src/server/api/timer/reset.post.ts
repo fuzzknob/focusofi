@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
   const user = event.context.user as User
   const db = useDrizzle()
-  const timer = db.delete(tables.timers).where(eq(
+  const timer = await db.delete(tables.timers).where(eq(
     tables.timers.userId,
     user.id,
   )).returning().get()
