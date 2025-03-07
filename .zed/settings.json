@@ -1,0 +1,31 @@
+{
+  "languages": {
+    "JavaScript": {
+      "formatter": {
+        "code_actions": {
+          "source.fixAll.eslint": true
+        }
+      }
+    },
+    "Vue.js": {
+      "formatter": {
+        "code_actions": {
+          "source.fixAll.eslint": true
+        }
+      },
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "TypeScript": {
+      "formatter": {
+        "code_actions": {
+          "source.fixAll.eslint": true
+        }
+      },
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    }
+  }
+}
