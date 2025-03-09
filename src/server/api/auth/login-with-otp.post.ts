@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { addYears, isAfter } from 'date-fns'
+import { addMonths, isAfter } from 'date-fns'
 
 import { getRandomString } from '~/server/libs/utils'
 import { eq, tables, useDrizzle } from '~/server/services/drizzle'
@@ -38,10 +38,17 @@ export default defineEventHandler(async (event) => {
     })
   }
   const token = getRandomString(30)
-  await db.insert(tables.sessions).values({
+  await hubKV().setItem(token, {
     token,
-    expiration: addYears(new Date(), 1),
-    userId: user.id,
+    expiration: addMonths(new Date(), 3),
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+  }, {
+    // 3 months
+    ttl: 60 * 60 * 24 * 30 * 3,
   })
   const session = await useSecureSession(event)
   await session.update({

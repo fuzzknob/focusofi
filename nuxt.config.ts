@@ -15,10 +15,13 @@ export default defineNuxtConfig({
   nitro: {
     experimental: {
       tasks: true,
+      openAPI: true,
     },
   },
   hub: {
     database: true,
+    cache: true,
+    kv: true,
   },
   vite: {
     plugins: [

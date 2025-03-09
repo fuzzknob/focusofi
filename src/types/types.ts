@@ -37,3 +37,9 @@ export interface User {
   email: string
   role: 'USER' | 'ADMIN'
 }
+
+export interface Session {
+  token: string
+  expiration: Date
+  user: User
+}

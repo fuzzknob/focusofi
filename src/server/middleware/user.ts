@@ -1,5 +1,5 @@
 import { useSecureSession } from '../libs/secure_session'
-import { useDrizzle, eq, tables } from '../services/drizzle'
+import type { Session } from '~/types/types'
 
 export default defineEventHandler(async (event) => {
   if (!useRuntimeConfig(event).cookiePassword) return
@@ -9,13 +9,7 @@ export default defineEventHandler(async (event) => {
     return
   }
   const token = authorization.replace('Bearer ', '')
-  const db = useDrizzle()
-  const session = await db.query.sessions.findFirst({
-    where: eq(tables.sessions.token, token),
-    with: {
-      user: true,
-    },
-  })
+  const session = await hubKV().get<Session>(token)
   if (!session) return
   event.context.user = session.user
 })

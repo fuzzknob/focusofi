@@ -1,6 +1,4 @@
 import { useSecureSession } from '~/server/libs/secure_session'
-import { eq, tables, useDrizzle } from '~/server/services/drizzle'
-import type { User } from '~/types/types'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
@@ -9,10 +7,13 @@ export default defineEventHandler(async (event) => {
       message: 'not logged in',
     }
   }
-  const user = event.context.user as User
   const session = await useSecureSession(event)
+  const authorization = session.data.authorization as string | undefined
+  if (!authorization) {
+    return
+  }
+  const token = authorization.replace('Bearer ', '')
+  hubKV().del(token)
   await session.clear()
-  const db = useDrizzle()
-  await db.delete(tables.sessions).where(eq(tables.sessions.userId, Number(user.id)))
   return { message: 'logged out' }
 })
