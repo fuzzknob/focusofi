@@ -13,17 +13,18 @@ const { status } = storeToRefs(timerStore)
 let timeout: NodeJS.Timeout | null = null
 let expectedTimeout: number | null = null
 
-const url = useRequestURL()
-const websocketUrl = `${url.protocol === 'https:' ? 'wss://' : 'ws://'}${url.host}/api/timer/live`
+// TODO: do something about websocket
+// const url = useRequestURL()
+// const websocketUrl = `${url.protocol === 'https:' ? 'wss://' : 'ws://'}${url.host}/api/timer/live`
 
-const { send } = useWebSocket(websocketUrl, {
-  onConnected() {
-    console.log('connnected')
-  },
-  async onMessage(_, event) {
-    console.log({ message: await event.data.text() })
-  },
-})
+// const { send } = useWebSocket(websocketUrl, {
+//   onConnected() {
+//     console.log('connnected')
+//   },
+//   async onMessage(_, event) {
+//     console.log({ message: await event.data.text() })
+//   },
+// })
 
 watch(status, (status) => {
   if (import.meta.server) return
@@ -147,12 +148,12 @@ function resumeTimer() {
             STOP
           </Button>
         </template>
-        <Button
+        <!-- <Button
           class="px-5 py-1"
           @click="websocketTest"
         >
           WS
-        </Button>
+        </Button> -->
       </div>
     </template>
   </div>
