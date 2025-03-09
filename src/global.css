@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 body {
-  font-family: 'Jersey 15', sans-serif;
+  font-family: "Jersey 15", sans-serif;
 }
 
 .flex-center {
-  @apply flex justify-center items-center;
+  @apply flex items-center justify-center;
 }
