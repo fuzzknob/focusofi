@@ -21,7 +21,7 @@ onMounted(async () => {
 <template>
   <div>
     <Head>
-      <Title>Pomo</Title>
+      <Title>Pomo - Alpha Version</Title>
     </Head>
     <NuxtPage />
   </div>
