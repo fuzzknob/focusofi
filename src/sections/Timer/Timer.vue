@@ -9,8 +9,21 @@ import Button from '@/components/ButtonSquare.vue'
 
 const timerStore = useTimerStore()
 const { status } = storeToRefs(timerStore)
+
 let timeout: NodeJS.Timeout | null = null
 let expectedTimeout: number | null = null
+
+const url = useRequestURL()
+const websocketUrl = `${url.protocol === 'https:' ? 'wss://' : 'ws://'}${url.host}/api/timer/live`
+
+const { send } = useWebSocket(websocketUrl, {
+  onConnected() {
+    console.log('connnected')
+  },
+  async onMessage(_, event) {
+    console.log({ message: await event.data.text() })
+  },
+})
 
 watch(status, (status) => {
   if (import.meta.server) return
@@ -65,6 +78,10 @@ function clearTimeInterval() {
     expectedTimeout = null
     timeout = null
   }
+}
+
+function websocketTest() {
+  send('testing the ground here')
 }
 
 function startTimer() {
@@ -130,6 +147,12 @@ function resumeTimer() {
             STOP
           </Button>
         </template>
+        <Button
+          class="px-5 py-1"
+          @click="websocketTest"
+        >
+          WS
+        </Button>
       </div>
     </template>
   </div>
