@@ -26,12 +26,14 @@ export const useTimerStore = defineStore('timer', {
       const settings = useSettingsStore()
       if (status === TimerStatus.Working) {
         if (time <= 0) {
-          if (successionCount < 1) {
+          if (successionCount <= 1) {
             this.status = TimerStatus.LongBreak
+            this.successionCount = settings.breakSuccessions
             notifyLongBreak()
           }
           else {
             this.status = TimerStatus.ShortBreak
+            this.successionCount -= 1
             notifyShortBreak()
           }
           this.startTime = addSeconds(startTime, settings.workLength)
@@ -45,7 +47,6 @@ export const useTimerStore = defineStore('timer', {
       if (status === TimerStatus.LongBreak || status === TimerStatus.ShortBreak) {
         if (time <= 0) {
           this.status = TimerStatus.Working
-          this.successionCount = successionCount < 1 ? settings.breakSuccessions : successionCount - 1
           notifyWorkStart()
           this.startTime = addSeconds(
             startTime, status === TimerStatus.LongBreak ? settings.longBreakLength : settings.shortBreakLength,
@@ -146,10 +147,9 @@ export const useTimerStore = defineStore('timer', {
       }
     },
     async endBreak() {
-      const settings = useSettingsStore()
+      // const settings = useSettingsStore()
       const { successionCount } = this
       this.status = TimerStatus.Working
-      this.successionCount = successionCount < 1 ? settings.breakSuccessions : successionCount - 1
       this.startTime = new Date()
       this.calculateTime()
       const user = useUser()
@@ -157,7 +157,7 @@ export const useTimerStore = defineStore('timer', {
         const { report } = this
         await endBreak({
           startTime: this.startTime,
-          successionCount: this.successionCount,
+          successionCount: successionCount,
           totalBreakTime: report.totalBreakTaken,
           totalWorkTime: report.totalWorked,
         })

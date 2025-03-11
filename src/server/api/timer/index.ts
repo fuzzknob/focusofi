@@ -73,7 +73,14 @@ function calculateCurrentTimer({ settings, timer }: {
     if (state.status === TimerStatus.Working) {
       const endTime = addMilliseconds(state.startTime, settings.workLength * 1000)
       if (isBefore(endTime, now)) {
-        state.status = state.successionCount < 1 ? TimerStatus.LongBreak : TimerStatus.ShortBreak
+        if (state.successionCount <= 1) {
+          state.status = TimerStatus.LongBreak
+          state.successionCount = settings.breakSuccessions
+        }
+        else {
+          state.status = TimerStatus.ShortBreak
+          state.successionCount -= 1
+        }
         state.totalWorkTime += settings.workLength
         state.startTime = endTime
         continue
@@ -85,7 +92,6 @@ function calculateCurrentTimer({ settings, timer }: {
       if (isBefore(endTime, now)) {
         state.status = TimerStatus.Working
         state.startTime = endTime
-        state.successionCount -= 1
         state.totalBreakTime += settings.shortBreakLength
         continue
       }
@@ -96,7 +102,6 @@ function calculateCurrentTimer({ settings, timer }: {
       if (isBefore(endTime, now)) {
         state.status = TimerStatus.Working
         state.startTime = endTime
-        state.successionCount = settings.breakSuccessions
         state.totalBreakTime += settings.longBreakLength
         continue
       }

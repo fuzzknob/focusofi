@@ -6,10 +6,13 @@ import { formatSecondsToTime } from '@/libs/utils'
 
 import { TimerStatus } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
+import { useSettingsStore } from '@/stores/settings'
 
 const timerStore = useTimerStore()
+const settingsStore = useSettingsStore()
 
 const { status, time, successionCount } = storeToRefs(timerStore)
+const { breakSuccessions } = storeToRefs(settingsStore)
 
 const minutesHand = ref('00')
 const secondsHand = ref('00')
@@ -18,17 +21,21 @@ const separatorVisible = computed(() => {
   return time.value % 2 === 0
 })
 
-const message = computed(() => {
-  if (status.value === TimerStatus.Working) {
-    return `${successionCount.value < 1 ? 'Long break' : 'Short break'} in...`
+const activePattern = computed(() => {
+  if (status.value === TimerStatus.Idle) return -1
+  const total = (breakSuccessions.value * 2) - 1
+  if (status.value === TimerStatus.LongBreak) return total
+  const currentIndex = total - (successionCount.value * 2) + 1
+  return [TimerStatus.Working, TimerStatus.Paused].includes(status.value) ? currentIndex : currentIndex - 1
+})
+
+const pattern = computed(() => {
+  let pattern: string[] = []
+  for (let i = 0; i < (breakSuccessions.value - 1); i++) {
+    pattern = pattern.concat(['w', 's'])
   }
-  if ([TimerStatus.LongBreak, TimerStatus.ShortBreak].includes(status.value)) {
-    return 'Break end in...'
-  }
-  if (status.value === TimerStatus.Paused) {
-    return 'Timer paused'
-  }
-  return 'POMO TIMER'
+  pattern = pattern.concat(['w', 'l'])
+  return pattern
 })
 
 const textColor = computed(() => {
@@ -53,9 +60,40 @@ watch(time, () => {
 
 <template>
   <div>
-    <h1 class="-mb-36 text-4xl">
-      {{ message }}
-    </h1>
+    <div class="-mb-32 flex justify-center">
+      <div class="flex items-end text-2xl">
+        <template
+          v-for="(statusType, index) in pattern"
+          :key="index"
+        >
+          <div
+            v-if="statusType === 'w'"
+            class="h-8 w-9 border-4 border-r-0 border-white flex-center"
+            :class="{ 'border-l-0': index > 0, 'bg-white text-black': index === activePattern }"
+          >
+            W
+          </div>
+          <div
+            v-else-if="statusType === 's'"
+            class="h-10 border-4 border-white flex items-end"
+            :class="{ 'bg-white text-black': index === activePattern }"
+          >
+            <div class="flex-center w-7 h-6">
+              S
+            </div>
+          </div>
+          <div
+            v-else
+            class="h-10 border-4 border-white flex items-end"
+            :class="{ 'bg-white text-black': index === activePattern }"
+          >
+            <div class="flex-center w-7 h-6">
+              L
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
     <div
       class="time flex items-center"
       :class="textColor"

@@ -13,19 +13,6 @@ const { status } = storeToRefs(timerStore)
 let timeout: NodeJS.Timeout | null = null
 let expectedTimeout: number | null = null
 
-// TODO: do something about websocket
-// const url = useRequestURL()
-// const websocketUrl = `${url.protocol === 'https:' ? 'wss://' : 'ws://'}${url.host}/api/timer/live`
-
-// const { send } = useWebSocket(websocketUrl, {
-//   onConnected() {
-//     console.log('connnected')
-//   },
-//   async onMessage(_, event) {
-//     console.log({ message: await event.data.text() })
-//   },
-// })
-
 watch(status, (status) => {
   if (import.meta.server) return
   if ([
@@ -79,10 +66,6 @@ function clearTimeInterval() {
     expectedTimeout = null
     timeout = null
   }
-}
-
-function websocketTest() {
-  send('testing the ground here')
 }
 
 function startTimer() {
