@@ -45,24 +45,25 @@ export function timeToText(time: Time, short = false) {
   const { hours, minutes, seconds } = time
   const timeEntities = []
   if (hours) {
-    timeEntities.push(`${hours} ${hours > 1 ? 'hours' : 'hour'}`)
+    // timeEntities.push(`${hours} ${hours > 1 ? 'hours' : 'hour'}`)
+    timeEntities.push(`${hours}h`)
   }
   if (minutes) {
-    timeEntities.push(`${minutes} ${minutes > 1 ? 'minutes' : 'minute'}`)
+    timeEntities.push(`${minutes}m`)
   }
   if (seconds) {
-    timeEntities.push(`${seconds} ${seconds > 1 ? 'seconds' : 'second'}`)
+    timeEntities.push(`${seconds}s`)
   }
   if (timeEntities.length === 0) {
-    return '0 seconds'
+    return '0s'
   }
   if (timeEntities.length === 1) {
     return timeEntities[0]
   }
-  return timeEntities.map((entity, index) => {
-    if (index === (timeEntities.length - 1)) {
-      return `and ${entity}`
-    }
+  return timeEntities.map((entity) => {
+    // if (index === (timeEntities.length - 1)) {
+    //   return `and ${entity}`
+    // }
     return entity
   }).join(' ')
 }

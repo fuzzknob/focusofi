@@ -91,7 +91,7 @@ function resumeTimer() {
 </script>
 
 <template>
-  <div class="w-[560px]">
+  <div>
     <div
       v-if="status === TimerStatus.Stopped"
       class="flex flex-col items-center gap-4"
@@ -100,7 +100,7 @@ function resumeTimer() {
     </div>
     <template v-else>
       <Time />
-      <div class="flex-center gap-6 text-3xl -mt-24">
+      <div class="flex-center gap-6 text-3xl md:-mt-24 -mt-20">
         <Button
           v-if="status === TimerStatus.Idle"
           class="px-5 py-1"

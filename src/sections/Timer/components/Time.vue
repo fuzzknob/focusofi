@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { reactive } from 'vue'
 import { padStart } from 'lodash'
 
 import { formatSecondsToTime } from '@/libs/utils'
@@ -14,8 +14,8 @@ const settingsStore = useSettingsStore()
 const { status, time, successionCount } = storeToRefs(timerStore)
 const { breakSuccessions } = storeToRefs(settingsStore)
 
-const minutesHand = ref('00')
-const secondsHand = ref('00')
+const minutesHand = ref(['O', 'O'])
+const secondsHand = ref(['O', 'O'])
 
 const separatorVisible = computed(() => {
   return time.value % 2 === 0
@@ -51,8 +51,8 @@ const textColor = computed(() => {
 
 watch(time, () => {
   const { minutes, seconds } = formatSecondsToTime(time.value)
-  minutesHand.value = padStart(minutes.toString(), 2, '0')
-  secondsHand.value = padStart(seconds.toString(), 2, '0')
+  minutesHand.value = padStart(minutes.toString(), 2, '0').replaceAll('0', 'O').split('')
+  secondsHand.value = padStart(seconds.toString(), 2, '0').replaceAll('0', 'O').split('')
 }, {
   immediate: true,
 })
@@ -60,7 +60,7 @@ watch(time, () => {
 
 <template>
   <div>
-    <div class="-mb-32 flex justify-center">
+    <div class="md:-mb-28 -mb-20 flex justify-center">
       <div class="flex items-end text-2xl">
         <template
           v-for="(statusType, index) in pattern"
@@ -95,26 +95,33 @@ watch(time, () => {
       </div>
     </div>
     <div
-      class="time flex items-center"
+      class="flex items-center text-[13rem] md:text-[19rem]"
       :class="textColor"
     >
       <div class="flex">
-        {{ minutesHand }}
+        <div class="w-[90px] md:w-[135px] text-end">
+          {{ minutesHand[0] }}
+        </div>
+        <div class="w-[90px] md:w-[135px] text-end">
+          {{ minutesHand[1] }}
+        </div>
       </div>
-      <div class="separator flex flex-center pb-4 pointer-events-none">
+      <div class="w-[50px] md:w-[60px] flex flex-center pb-4 pointer-events-none">
         <span :class="{ 'opacity-0': !separatorVisible }">:</span>
       </div>
       <div class="flex">
-        {{ secondsHand }}
+        <div class="w-[90px] md:w-[135px] text-end">
+          {{ secondsHand[0] }}
+        </div>
+        <div class="w-[90px] md:w-[135px] text-end">
+          {{ secondsHand[1] }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.time {
-  font-size: 19rem;
-}
 .separator {
   width: 60px;
 
