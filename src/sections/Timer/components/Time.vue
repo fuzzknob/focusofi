@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { reactive } from 'vue'
 import { padStart } from 'lodash'
 
 import { formatSecondsToTime } from '@/libs/utils'
@@ -51,8 +50,8 @@ const textColor = computed(() => {
 
 watch(time, () => {
   const { minutes, seconds } = formatSecondsToTime(time.value)
-  minutesHand.value = padStart(minutes.toString(), 2, '0').replaceAll('0', 'O').split('')
-  secondsHand.value = padStart(seconds.toString(), 2, '0').replaceAll('0', 'O').split('')
+  minutesHand.value = padStart(minutes.toString(), 2, 'O').replaceAll('0', 'O').split('')
+  secondsHand.value = padStart(seconds.toString(), 2, 'O').replaceAll('0', 'O').split('')
 }, {
   immediate: true,
 })

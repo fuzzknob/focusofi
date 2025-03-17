@@ -113,7 +113,7 @@ async function handleOtpSubmit() {
             class="text-xl mt-2"
             :disabled="isLoading"
           >
-            {{ isLoading ? 'LOGGING IN...' : 'REQUEST LOGIN' }}
+            {{ isLoading ? 'REQUESTING...' : 'REQUEST LOGIN' }}
           </Button>
           <p
             v-if="errorMessage"
