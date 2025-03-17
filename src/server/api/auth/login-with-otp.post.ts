@@ -7,6 +7,7 @@ import { useSecureSession } from '~/server/libs/secure_session'
 
 const loginWithOtpSchema = z.object({
   otp: z.string().length(5),
+  mobile: z.boolean().default(false),
 })
 
 export default defineEventHandler(async (event) => {
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
     return { message: 'There was an validation error', errors: result.error.issues }
   }
   const db = useDrizzle()
-  const { otp } = result.data
+  const { otp, mobile } = result.data
   const emailOtp = await db.delete(tables.emailOtps).where(eq(tables.emailOtps.otpCode, otp)).returning().get()
   if (!emailOtp || isAfter(new Date(), emailOtp.expiration)) {
     setResponseStatus(event, 400)
@@ -50,6 +51,11 @@ export default defineEventHandler(async (event) => {
     // 3 months
     ttl: 60 * 60 * 24 * 30 * 3,
   })
+  if (mobile) {
+    return {
+      token,
+    }
+  }
   const session = await useSecureSession(event)
   await session.update({
     authorization: `Bearer ${token}`,

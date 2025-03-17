@@ -31,13 +31,13 @@ function resetTimer() {
       <div class="text-3xl ">
         <div class="flex justify-between">
           <span>
-            Worked:
+            Work Duration:
           </span>
           <span>{{ totalWorked }}</span>
         </div>
         <div class="flex justify-between">
           <span>
-            Break taken:
+            Break Duration:
           </span>
           <span>{{ totalBreak }}</span>
         </div>
