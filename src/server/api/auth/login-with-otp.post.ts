@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
     })
     await db.update(tables.users).set({
       hasVerified: true,
-    })
+    }).where(eq(tables.users.id, user.id))
   }
   const token = getRandomString(30)
   await hubKV().setItem(token, {
