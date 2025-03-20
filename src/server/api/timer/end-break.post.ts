@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { tables, useDrizzle } from '~/server/services/drizzle'
+import { eq, tables, useDrizzle } from '~/server/services/drizzle'
 import { sendEvent } from '~/server/services/event'
 import { type User, TimerEvent, TimerStatus } from '~/types/types'
 
@@ -40,9 +40,9 @@ export default defineEventHandler(async (event) => {
     successionCount: data.successionCount,
     workTillStatusChange: data.totalWorkTime,
     breakTillStatusChange: data.totalBreakTime,
-  })
+  }).where(eq(tables.timers.userId, user.id))
   if (timer != null) {
-    sendEvent(event, {
+    sendEvent(event, user, {
       event: TimerEvent.EndBreak,
       timer: {
         startTime: data.startTime,

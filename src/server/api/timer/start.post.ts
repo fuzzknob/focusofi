@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       userId: user.id,
     }).returning().get()
   if (timer != null) {
-    sendEvent(event, {
+    sendEvent(event, user, {
       event: TimerEvent.Start,
       timer: {
         startTime: timer.startTime,
