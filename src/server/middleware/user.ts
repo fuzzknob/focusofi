@@ -14,4 +14,5 @@ export default defineEventHandler(async (event) => {
   const session = await hubKV().get<Session>(token)
   if (!session) return
   event.context.user = session.user
+  event.context.token = token
 })

@@ -5,5 +5,12 @@ export default defineEventHandler(async (event) => {
       message: 'not logged in',
     }
   }
+  const { token } = getQuery<{ token?: boolean }>(event)
+  if (token) {
+    return {
+      token: event.context.token,
+      user: event.context.user,
+    }
+  }
   return event.context.user
 })
