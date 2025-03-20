@@ -15,6 +15,10 @@ export default defineNuxtConfig({
     cookiePassword: '',
     resendApiKey: '',
     emailFromAddress: '',
+    sseEventSecret: '',
+    public: {
+      sseUrl: '',
+    },
   },
   srcDir: 'src/',
   compatibilityDate: '2024-11-01',

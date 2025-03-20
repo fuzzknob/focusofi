@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { tables, useDrizzle } from '~/server/services/drizzle'
-import { type User, TimerStatus } from '~/types/types'
+import { sendEvent } from '~/server/services/event'
+import { type User, TimerEvent, TimerStatus } from '~/types/types'
 
 const startTimerSchema = z.object({
   startTime: z.coerce.date(),
@@ -43,8 +44,20 @@ export default defineEventHandler(async (event) => {
       status: TimerStatus.Working,
       successionCount: settings.breakSuccessions,
       userId: user.id,
+    }).returning().get()
+  if (timer != null) {
+    sendEvent(event, {
+      event: TimerEvent.Start,
+      timer: {
+        startTime: timer.startTime,
+        status: timer.status as TimerStatus,
+        elapsedPrePause: timer.elapsedPrePause,
+        successionCount: timer.successionCount,
+        totalBreakTime: timer.breakTillStatusChange,
+        totalWorkTime: timer.workTillStatusChange,
+      },
     })
-  // TODO: send websocket event
+  }
   return {
     message: 'Started timer',
   }

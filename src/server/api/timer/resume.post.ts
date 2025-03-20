@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { tables, useDrizzle } from '~/server/services/drizzle'
-import { type User, TimerStatus } from '~/types/types'
+import { sendEvent } from '~/server/services/event'
+import { type User, TimerEvent, TimerStatus } from '~/types/types'
 
 const resumeTimerSchema = z.object({
   startTime: z.coerce.date(),
@@ -19,6 +20,7 @@ export default defineEventHandler(async (event) => {
   }
   const user = event.context.user as User
   const db = useDrizzle()
+  const { data } = result
   const timer = await db
     .query
     .timers
@@ -34,11 +36,23 @@ export default defineEventHandler(async (event) => {
     return { message: 'The timer is not paused' }
   }
   await db.update(tables.timers).set({
-    startTime: result.data.startTime,
+    startTime: data.startTime,
     status: TimerStatus.Working,
     elapsedPrePause: 0,
   })
-  // TODO: send websocket event
+  if (timer != null) {
+    sendEvent(event, {
+      event: TimerEvent.Resume,
+      timer: {
+        startTime: data.startTime,
+        status: TimerStatus.Working,
+        elapsedPrePause: 0,
+        successionCount: timer.successionCount,
+        totalWorkTime: timer.workTillStatusChange,
+        totalBreakTime: timer.breakTillStatusChange,
+      },
+    })
+  }
   return {
     message: 'Resumed Timer',
   }

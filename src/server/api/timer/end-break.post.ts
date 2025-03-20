@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { tables, useDrizzle } from '~/server/services/drizzle'
-import { type User, TimerStatus } from '~/types/types'
+import { sendEvent } from '~/server/services/event'
+import { type User, TimerEvent, TimerStatus } from '~/types/types'
 
 const endBreakSchema = z.object({
   startTime: z.coerce.date(),
@@ -40,7 +41,19 @@ export default defineEventHandler(async (event) => {
     workTillStatusChange: data.totalWorkTime,
     breakTillStatusChange: data.totalBreakTime,
   })
-  // TODO: send websocket event
+  if (timer != null) {
+    sendEvent(event, {
+      event: TimerEvent.EndBreak,
+      timer: {
+        startTime: data.startTime,
+        status: TimerStatus.Working,
+        successionCount: data.successionCount,
+        totalBreakTime: data.totalBreakTime,
+        totalWorkTime: data.totalWorkTime,
+        elapsedPrePause: timer.elapsedPrePause,
+      },
+    })
+  }
   return {
     message: 'Ended Break',
   }
