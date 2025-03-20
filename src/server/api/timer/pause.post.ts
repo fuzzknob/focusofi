@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 import { tables, useDrizzle } from '~/server/services/drizzle'
-import { TimerStatus, type User } from '~/types/types'
+import { sendEvent } from '~/server/services/event'
+import { TimerEvent, TimerStatus, type User } from '~/types/types'
 
 const pauseTimerSchema = z.object({
   elapsedPrePause: z.number(),
@@ -45,7 +46,19 @@ export default defineEventHandler(async (event) => {
     workTillStatusChange: data.totalWorkTime,
     breakTillStatusChange: data.totalBreakTime,
   })
-  // TODO: send websocket event
+  if (timer != null) {
+    sendEvent(event, {
+      event: TimerEvent.Pause,
+      timer: {
+        status: TimerStatus.Paused,
+        elapsedPrePause: data.elapsedPrePause,
+        successionCount: data.successionCount,
+        totalWorkTime: data.totalWorkTime,
+        totalBreakTime: data.totalBreakTime,
+        startTime: timer.startTime,
+      },
+    })
+  }
   return {
     message: 'Paused Timer',
   }

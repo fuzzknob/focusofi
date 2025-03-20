@@ -1,5 +1,6 @@
 import { tables, useDrizzle, eq } from '~/server/services/drizzle'
-import type { User } from '~/types/types'
+import { sendEvent } from '~/server/services/event'
+import { TimerEvent, type User } from '~/types/types'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
@@ -18,6 +19,10 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 400)
     return { message: 'There is no running timer' }
   }
+  // TODO: send reset event
+  sendEvent(event, {
+    event: TimerEvent.Reset,
+  })
   return {
     message: 'Reset Timer',
   }

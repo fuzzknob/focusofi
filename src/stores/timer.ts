@@ -1,9 +1,9 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { differenceInSeconds, addSeconds, subSeconds } from 'date-fns'
+import { differenceInSeconds, addSeconds, subSeconds, isEqual } from 'date-fns'
 
 import { useSettingsStore } from './settings'
-import type { Fetch } from '~/types/types'
 import { TimerStatus } from '@/types/types'
+import type { Fetch, Timer } from '@/types/types'
 import { notifyLongBreak, notifyShortBreak, notifyWorkStart } from '@/services/notification'
 import { fetchTimer, startTimer, pauseTimer, resumeTimer, endBreak, stopTimer, resetTimer } from '~/services/timer'
 
@@ -85,7 +85,7 @@ export const useTimerStore = defineStore('timer', {
         new Date(),
       )
     },
-    async reset() {
+    async reset(option?: { noSend: boolean }) {
       this.time = 0
       this.status = TimerStatus.Idle
       this.successionCount = 0
@@ -96,7 +96,7 @@ export const useTimerStore = defineStore('timer', {
         totalBreakTaken: 0,
       }
       const user = useUser()
-      if (user.value) {
+      if (user.value && !(option && option.noSend)) {
         await resetTimer()
       }
     },
@@ -166,6 +166,10 @@ export const useTimerStore = defineStore('timer', {
     async getTimer(fetch: Fetch) {
       const timer = await fetchTimer(fetch)
       if (!timer) return
+      this.setTimer(timer)
+    },
+
+    setTimer(timer: Timer) {
       this.status = timer.status
       this.successionCount = timer.successionCount
       this.startTime = timer.startTime

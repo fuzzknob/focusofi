@@ -1,35 +1,55 @@
 <script lang="ts" setup>
-import { getMilliseconds } from 'date-fns'
+import { getMilliseconds, isEqual } from 'date-fns'
 
 import Time from './components/Time.vue'
 import Report from './components/Report.vue'
-import { TimerStatus } from '@/types/types'
+import { TimerStatus, TimerEvent, type SseEvent } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
 import Button from '@/components/ButtonSquare.vue'
 
+const runtimeConfig = useRuntimeConfig()
 const timerStore = useTimerStore()
 const { status } = storeToRefs(timerStore)
 
 let timeout: NodeJS.Timeout | null = null
 let expectedTimeout: number | null = null
+let eventSource: EventSource | null = null
 
-watch(status, (status) => {
-  if (import.meta.server) return
-  if ([
-    TimerStatus.Working,
-    TimerStatus.LongBreak,
-    TimerStatus.ShortBreak,
-  ].includes(status)
-  && !timeout) {
-    tick()
-    return
-  }
-  if ([TimerStatus.Stopped, TimerStatus.Paused].includes(status) && timeout) {
-    clearTimeInterval()
-  }
+onMounted(() => {
+  adjustTimer()
 })
 
 onMounted(() => {
+  eventSource = new EventSource(runtimeConfig.public.sseUrl, {
+    withCredentials: true,
+  })
+  eventSource.addEventListener('message', ({ data }) => {
+    if (!data) return
+    const { event, timer } = JSON.parse(data) as SseEvent
+    if (event === TimerEvent.Reset) {
+      timerStore.reset({ noSend: true })
+      return
+    }
+    if (
+      !timer
+      || (timerStore.startTime
+        && isEqual(timerStore.startTime, timer.startTime)
+        && timerStore.status === timer.status)
+    ) {
+      return
+    }
+    clearTimeInterval()
+    timerStore.setTimer(timer)
+    adjustTimer()
+  })
+})
+
+onUnmounted(() => {
+  eventSource?.close()
+  eventSource = null
+})
+
+function adjustTimer() {
   if ([
     TimerStatus.Working,
     TimerStatus.LongBreak,
@@ -44,7 +64,7 @@ onMounted(() => {
     timeout = setTimeout(tick, interval)
     return
   }
-})
+}
 
 function tick() {
   timerStore.tick()
@@ -70,23 +90,28 @@ function clearTimeInterval() {
 
 function startTimer() {
   timerStore.start()
+  tick()
 }
 
 function stopTimer() {
   timerStore.stop()
+  clearTimeInterval()
 }
 
 function endBreak() {
   clearTimeInterval()
   timerStore.endBreak()
+  tick()
 }
 
 function pauseTimer() {
   timerStore.pause()
+  clearTimeInterval()
 }
 
 function resumeTimer() {
   timerStore.resume()
+  tick()
 }
 </script>
 
@@ -131,12 +156,6 @@ function resumeTimer() {
             STOP
           </Button>
         </template>
-        <!-- <Button
-          class="px-5 py-1"
-          @click="websocketTest"
-        >
-          WS
-        </Button> -->
       </div>
     </template>
   </div>
