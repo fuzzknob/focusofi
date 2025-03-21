@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
     elapsedPrePause: 0,
   }).where(eq(tables.timers.userId, user.id))
   if (timer != null) {
-    sendEvent(event, user, {
+    await sendEvent(event, user, {
       event: TimerEvent.Resume,
       timer: {
         startTime: data.startTime,

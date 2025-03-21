@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
     breakTillStatusChange: data.totalBreakTime,
   }).where(eq(tables.timers.userId, user.id))
   if (timer != null) {
-    sendEvent(event, user, {
+    await sendEvent(event, user, {
       event: TimerEvent.Pause,
       timer: {
         status: TimerStatus.Paused,

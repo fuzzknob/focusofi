@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 400)
     return { message: 'There is no running timer' }
   }
-  sendEvent(event, user, {
+  await sendEvent(event, user, {
     event: TimerEvent.Reset,
   })
   return {
