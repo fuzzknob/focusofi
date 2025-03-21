@@ -1,55 +1,9 @@
 {
   "name": "pomo",
   "private": true,
-  "type": "module",
+  "license": "ISC",
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "pnpx nuxthub preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "db:generate": "drizzle-kit generate"
+    "web:dev": "pnpm --filter @pomo/web dev"
   },
-  "dependencies": {
-    "@nuxt/fonts": "0.10.3",
-    "@nuxthub/core": "0.8.17",
-    "@pinia/nuxt": "0.9.0",
-    "@tailwindcss/vite": "^4.0.1",
-    "@vee-validate/zod": "^4.15.0",
-    "@vueuse/core": "^12.8.2",
-    "@vueuse/nuxt": "^12.8.2",
-    "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.40.0",
-    "h3": "^1.15.1",
-    "lodash": "^4.17.21",
-    "nuxt": "^3.16.0",
-    "pinia": "^2.3.0",
-    "resend": "^4.1.2",
-    "tailwindcss": "^4.0.1",
-    "vee-validate": "^4.15.0",
-    "vue": "latest",
-    "vue-router": "latest",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@nuxt/eslint": "^1.0.0",
-    "@types/lodash": "^4.17.15",
-    "drizzle-kit": "^0.30.5",
-    "eslint": "^9.19.0",
-    "prettier": "^3.4.2",
-    "typescript": "^5.7.3",
-    "wrangler": "^4.0.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "esbuild",
-      "sharp",
-      "vue-demi",
-      "workerd"
-    ]
-  },
-  "packageManager": "pnpm@9.11.0+sha1.4cd20e68438613738e8f2bc9aece61eaa6b3e649"
+  "packageManager": "pnpm@10.6.0"
 }

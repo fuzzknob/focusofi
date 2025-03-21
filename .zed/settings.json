@@ -1,4 +1,13 @@
 {
+  "lsp": {
+    "deno": {
+      "settings": {
+        "deno": {
+          "enable": false
+        }
+      }
+    }
+  },
   "languages": {
     "JavaScript": {
       "formatter": {
