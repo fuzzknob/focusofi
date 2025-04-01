@@ -5,16 +5,17 @@ import Time from './components/Time.vue'
 import Report from './components/Report.vue'
 import Button from '@/components/ButtonSquare.vue'
 
-import { TimerStatus, TimerEvent, type SseEvent } from '@/types/types'
+import { TimerStatus } from '@/types/types'
+// import { TimerStatus, TimerEvent, type SseEvent } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
-import { useToken } from '@/composables/useToken'
+// import { useToken } from '@/composables/useToken'
 
-const runtimeConfig = useRuntimeConfig()
-const token = useToken()
+// const runtimeConfig = useRuntimeConfig()
+// const token = useToken()
 const timerStore = useTimerStore()
 const { status } = storeToRefs(timerStore)
 
-let timeout: NodeJS.Timeout | null = null
+let timeout: number | null = null
 let expectedTimeout: number | null = null
 let eventSource: EventSource | null = null
 
@@ -23,27 +24,27 @@ onMounted(() => {
 })
 
 onMounted(() => {
-  if (!token) return
-  eventSource = new EventSource(`${runtimeConfig.public.sseUrl}?token=${token.value}`)
-  eventSource.addEventListener('message', ({ data }) => {
-    if (!data) return
-    const { event, timer } = JSON.parse(data) as SseEvent
-    if (event === TimerEvent.Reset) {
-      timerStore.reset({ noSend: true })
-      return
-    }
-    if (
-      !timer
-      || (timerStore.startTime
-        && isEqual(timerStore.startTime, timer.startTime)
-        && timerStore.status === timer.status)
-    ) {
-      return
-    }
-    clearTimeInterval()
-    timerStore.setTimer(timer)
-    adjustTimer()
-  })
+  // if (!token) return
+  // eventSource = new EventSource(`${runtimeConfig.public.sseUrl}?token=${token.value}`)
+  // eventSource.addEventListener('message', ({ data }) => {
+  //   if (!data) return
+  //   const { event, timer } = JSON.parse(data) as SseEvent
+  //   if (event === TimerEvent.Reset) {
+  //     timerStore.reset({ noSend: true })
+  //     return
+  //   }
+  //   if (
+  //     !timer
+  //     || (timerStore.startTime
+  //       && isEqual(timerStore.startTime, timer.startTime)
+  //       && timerStore.status === timer.status)
+  //   ) {
+  //     return
+  //   }
+  //   clearTimeInterval()
+  //   timerStore.setTimer(timer)
+  //   adjustTimer()
+  // })
 })
 
 onUnmounted(() => {
