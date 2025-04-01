@@ -3,7 +3,8 @@
   "private": true,
   "license": "ISC",
   "scripts": {
-    "web:dev": "pnpm --filter @pomo/web dev"
+    "web:dev": "pnpm --filter @pomo/web dev",
+    "web:build": "pnpm --filter @pomo/web build"
   },
   "packageManager": "pnpm@10.6.0"
 }
