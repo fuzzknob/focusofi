@@ -1,0 +1,8 @@
+packages:
+  - apps/web
+onlyBuiltDependencies:
+  - "@parcel/watcher"
+  - esbuild
+  - sharp
+  - vue-demi
+  - workerd

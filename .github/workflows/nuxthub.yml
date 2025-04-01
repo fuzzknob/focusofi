@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -34,10 +34,11 @@ jobs:
         run: pnpx nuxthub@latest ensure
 
       - name: Build application
-        run: pnpm build
+        run: pnpm web:build
 
       - name: Deploy to NuxtHub
         uses: nuxt-hub/action@v1
         id: deploy
         with:
           project-key: pomo-kdzz
+          directory: apps/web/dist
