@@ -34,10 +34,10 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 400)
     return { message: 'There is no running timer' }
   }
-  if (timer.status !== TimerStatus.Working) {
-    setResponseStatus(event, 400)
-    return { message: 'Timer can only be paused while the status is WORKING' }
-  }
+  // if (timer.status !== TimerStatus.Working) {
+  //   setResponseStatus(event, 400)
+  //   return { message: 'Timer can only be paused while the status is WORKING' }
+  // }
   const { data } = result
   await db.update(tables.timers).set({
     status: TimerStatus.Paused,
