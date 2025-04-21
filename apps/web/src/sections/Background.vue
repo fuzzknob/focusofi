@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
+import type { Background } from '~/types/types'
 
-const { data } = await useFetch('/api/background')
+const { data } = await useApi<Background>('/background')
 
 const image = ref(data.value?.img ?? '/1.gif')
 
 async function refetchImage() {
-  const { img } = await $fetch('/api/background')
+  const { img } = await api('/background')
   const imageElement = new Image()
   imageElement.onload = () => {
     image.value = img ?? ''
@@ -27,7 +28,7 @@ onMounted(() => {
     :style="{ background: `url(${image}) no-repeat`, backgroundSize: 'cover' }"
   >
     <div class="bg-black/40 w-full h-full">
-      <!-- <button @click="() => console.log('some')">
+      <!-- <button @click="refetchImage">
         next
       </button> -->
     </div>

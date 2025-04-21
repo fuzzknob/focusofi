@@ -1,5 +1,5 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { differenceInSeconds, addSeconds, subSeconds, isEqual } from 'date-fns'
+import { differenceInSeconds, addSeconds, subSeconds } from 'date-fns'
 
 import { useSettingsStore } from './settings'
 import { TimerStatus } from '@/types/types'

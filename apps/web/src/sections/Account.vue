@@ -4,7 +4,7 @@ import { useUser } from '@/composables/useUser'
 const user = useUser()
 
 async function handleLogout() {
-  await $fetch('/api/auth/logout')
+  await api('/api/auth/logout')
   reloadNuxtApp()
 }
 </script>

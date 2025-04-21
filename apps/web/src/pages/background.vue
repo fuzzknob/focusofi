@@ -5,7 +5,7 @@ import type { Background } from '@/types/types'
 const newImg = ref('')
 const isAdding = ref(false)
 
-const { data: backgrounds } = useFetch<Background[]>('/api/background/all')
+const { data: backgrounds } = await useApi<Background[]>('/background/all')
 
 useHead({
   title: 'Background Config - Pomo',
@@ -20,13 +20,14 @@ async function handleAdd() {
   }
   isAdding.value = true
   try {
-    const background = await $fetch<Background>('/api/background', {
+    const background = await api<Background>('/background', {
       method: 'POST',
       body: {
         img: newImage,
       },
     })
-    backgrounds.value?.push(background)
+    backgrounds.value = [background].concat(backgrounds.value)
+    // backgrounds.value?.push(background)
     newImg.value = ''
   }
   catch (e) {
@@ -41,7 +42,7 @@ async function handleAdd() {
 
 async function handleDelete(id: number) {
   try {
-    await $fetch(`/api/background/${id}`, {
+    await api(`/background/${id}`, {
       method: 'DELETE',
     })
     backgrounds.value = backgrounds.value?.filter(background => background.id !== id) ?? []

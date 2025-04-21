@@ -28,7 +28,7 @@ useHead({
 const handleRequestLogin = handleSubmit(async (values) => {
   isLoading.value = true
   try {
-    await $fetch('/api/auth/request-login', {
+    await api('/auth/request-login', {
       method: 'POST',
       body: {
         email: values.email,
@@ -48,7 +48,7 @@ const handleRequestLogin = handleSubmit(async (values) => {
 async function handleOtpSubmit() {
   isLoading.value = true
   try {
-    await $fetch('/api/auth/login-with-otp', {
+    await api('/auth/login-with-otp', {
       method: 'POST',
       body: {
         otp: otpCode.value,

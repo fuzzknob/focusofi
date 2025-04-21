@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     sseEventSecret: '',
     public: {
       sseUrl: '',
+      apiBase: '',
     },
   },
   srcDir: 'src/',
