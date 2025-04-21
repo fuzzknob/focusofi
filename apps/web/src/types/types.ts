@@ -37,7 +37,7 @@ export interface Background {
   img: string
 }
 
-export type Fetch = H3Event$Fetch | typeof global.$fetch
+export type Fetch = H3Event$Fetch | typeof $fetch
 
 export interface Settings {
   workLength: number

@@ -11,7 +11,7 @@ const DEFAULT_SETTINGS = {
 
 export async function getSettingsFromServer(fetch: Fetch): Promise<Settings | null> {
   try {
-    const data = await fetch<Settings>('/api/settings')
+    const data = await fetch<Settings>('/settings')
     return data
   }
   catch {

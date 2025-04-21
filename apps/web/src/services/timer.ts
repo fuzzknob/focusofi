@@ -2,7 +2,7 @@ import type { Fetch, Timer } from '~/types/types'
 
 export async function fetchTimer(fetch: Fetch) {
   try {
-    const data = await fetch<Timer>('/api/timer')
+    const data = await fetch<Timer>('/timer')
     return data
   }
   catch {
@@ -11,7 +11,7 @@ export async function fetchTimer(fetch: Fetch) {
 }
 
 export async function startTimer(startTime: Date) {
-  await $fetch('/api/timer/start', {
+  await api('/timer/start', {
     method: 'POST',
     body: {
       startTime,
@@ -25,14 +25,14 @@ export async function pauseTimer(body: {
   totalWorkTime: number
   totalBreakTime: number
 }) {
-  await $fetch('/api/timer/pause', {
+  await api('/timer/pause', {
     method: 'POST',
     body,
   })
 }
 
 export async function resumeTimer(startTime: Date) {
-  await $fetch('/api/timer/resume', {
+  await api('/timer/resume', {
     method: 'POST',
     body: {
       startTime,
@@ -46,7 +46,7 @@ export async function endBreak(body: {
   totalWorkTime: number
   totalBreakTime: number
 }) {
-  await $fetch('/api/timer/end-break', {
+  await api('/timer/end-break', {
     method: 'POST',
     body,
   })
@@ -57,14 +57,14 @@ export async function stopTimer(body: {
   totalWorkTime: number
   totalBreakTime: number
 }) {
-  await $fetch('/api/timer/stop', {
+  await api('/timer/stop', {
     method: 'POST',
     body,
   })
 }
 
 export async function resetTimer() {
-  await $fetch('/api/timer/reset', {
+  await api('/timer/reset', {
     method: 'POST',
   })
 }

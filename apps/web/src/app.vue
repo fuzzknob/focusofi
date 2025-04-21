@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useSettingsStore } from '@/stores/settings'
+import { useRequestApi } from '@/composables/useApi'
 
-const fetch = useRequestFetch()
+const fetch = useRequestApi()
 
 const settingsStore = useSettingsStore()
 const timerStore = useTimerStore()
