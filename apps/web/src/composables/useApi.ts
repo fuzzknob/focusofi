@@ -16,6 +16,7 @@ export function useRequestApi(): Fetch {
     return fetch<T>(path, {
       ...options,
       baseURL,
+      credentials: 'include',
     })
   }
 }
