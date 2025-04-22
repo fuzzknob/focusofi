@@ -1,0 +1,66 @@
+name: Deploy Server
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/server/**'
+      - '.github/workflows/server.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: focusofi-server
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/server
+          file: ./apps/server/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/fuzzknob/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/fuzzknob/${{ env.IMAGE_NAME }}:${{ github.sha }}
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production-server' || 'development-server' }}
+    needs:
+      - build-and-push-image
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create env file
+        run: |
+          echo "FRONT_END_URL=${{ vars.FRONT_END_URL }}" >> ./env-file
+          echo "BASE_HOST_URL=${{ vars.BASE_HOST_URL }}" >> ./env-file
+          echo "COOKIE_SECRET=${{ secrets.COOKIE_SECRET }}" >> ./env-file
+          echo "SERVER_URL=${{ vars.SERVER_URL }}" >> ./env-file
+          echo "IMAGE=ghcr.io/fuzzknob/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> ./env-file
+
+      - name: Docker stack deploy
+        uses: cssnr/stack-deploy-action@v1
+        with:
+          name: ${{ env.IMAGE_NAME }}
+          file: ./apps/server/compose.yml
+          host: ${{ vars.SERVER_URL }}
+          user: ${{ vars.DEPLOYMENT_USER }}
+          ssh_key: ${{ secrets.DEPLOYMENT_USER_SSH_KEY }}
+          env_file: ./env-file

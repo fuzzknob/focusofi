@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
-      - development
-
+    paths:
+      - 'apps/web/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/nuxthub.yml'
 jobs:
   deploy:
     name: "Deploy to NuxtHub"

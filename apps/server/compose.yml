@@ -1,0 +1,29 @@
+services:
+  pomoserver:
+    image: ${IMAGE}
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.web.loadbalancer.server.port=8000
+      - traefik.http.routers.web.rule=Host(`${SERVER_URL}`)
+      - traefik.http.routers.web.entrypoints=websecure
+      - traefik.http.routers.web.tls=true
+      - traefik.http.routers.web.tls.certresolver=myresolver
+    restart: unless-stopped
+    environment:
+      - PORT=8000
+      - SCHEMA_PATH=/app/db/schema.sql
+      - DATABASE_PATH=/data/pomo.db
+      - FRONT_END_URL=${FRONT_END_URL}
+      - BASE_HOST_URL=${BASE_HOST_URL}
+      - COOKIE_SECRET=${COOKIE_SECRET}
+    volumes:
+      - ${SERVER_DATABASE_DIRECTORY}:/data
+    networks:
+      - traefik_network
+    deploy:
+      update_config:
+        order: start-first
+
+networks:
+  traefik_network:
+    external: true
