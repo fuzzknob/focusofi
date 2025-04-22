@@ -16,7 +16,7 @@ RUN set -eux; \
     esac; \
     cp /usr/lib/$ARCH/libsqlite3.so.0.8.6 /runtime/lib/$ARCH/libsqlite3.so
 
-WORKDIR /app
+WORKDIR /focusofi
 
 COPY pubspec.* ./
 
@@ -26,18 +26,18 @@ COPY . .
 
 RUN dart pub get --offline
 
-RUN dart compile exe bin/pomo_server.dart -o bin/pomo_server
+RUN dart compile exe bin/pomo_server.dart -o focusofi_server
 
 FROM scratch
 
 COPY --from=build /runtime /
 
-COPY --from=build /app/db /app/db
-COPY --from=build /app/assets /assets
-COPY --from=build /app/bin/pomo_server /app/bin/
+COPY --from=build /focusofi/db /app/db
+COPY --from=build /focusofi/assets /app/assets
+COPY --from=build /focusofi/focusofi_server /app/focusofi_server
 
 EXPOSE 8000
 
-ENTRYPOINT ["/app/bin/pomo_server"]
+ENTRYPOINT ["/app/focusofi_server"]
 
 CMD ["migrate-start"]

@@ -1,9 +1,0 @@
-name: pomo
-version: 1.0.0
-
-environment:
-  sdk: ^3.7.0
-
-workspace:
-  - apps/mobile
-  - apps/server

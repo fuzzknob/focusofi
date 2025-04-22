@@ -3,8 +3,6 @@ description: Server for pomo app.
 version: 1.0.0
 publish_to: none
 
-resolution: workspace
-
 environment:
   sdk: ^3.7.2
 
