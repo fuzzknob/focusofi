@@ -1,0 +1,5 @@
+.dart_tool/
+.env
+/playground
+/db/pomo.db
+/db/pomo.db-*

@@ -9,8 +9,7 @@
     "preview": "pnpx nuxthub preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "db:generate": "drizzle-kit generate"
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@nuxt/fonts": "0.10.3",
@@ -21,12 +20,10 @@
     "@vueuse/core": "^12.8.2",
     "@vueuse/nuxt": "^12.8.2",
     "date-fns": "^4.1.0",
-    "drizzle-orm": "^0.40.1",
     "h3": "^1.15.1",
     "lodash": "^4.17.21",
     "nuxt": "^3.16.2",
     "pinia": "^2.3.1",
-    "resend": "^4.3.0",
     "tailwindcss": "^4.1.4",
     "vee-validate": "^4.15.0",
     "vue": "latest",

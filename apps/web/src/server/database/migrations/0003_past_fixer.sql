@@ -1,1 +1,0 @@
-ALTER TABLE `timers` ADD `timer_started_at` integer NOT NULL;

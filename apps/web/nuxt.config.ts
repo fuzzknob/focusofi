@@ -23,18 +23,7 @@ export default defineNuxtConfig({
   },
   srcDir: 'src/',
   compatibilityDate: '2024-11-01',
-  nitro: {
-    experimental: {
-      tasks: true,
-      openAPI: true,
-      websocket: true,
-    },
-  },
-  hub: {
-    database: true,
-    cache: true,
-    kv: true,
-  },
+  hub: {},
   vite: {
     plugins: [
       tailwindcss(),

@@ -8,7 +8,7 @@ const isAdding = ref(false)
 const { data: backgrounds } = await useApi<Background[]>('/background/all')
 
 useHead({
-  title: 'Background Config - Pomo',
+  title: 'Background Config - Focusofi',
 })
 
 async function handleAdd() {

@@ -23,7 +23,7 @@ onMounted(async () => {
 <template>
   <div>
     <Head>
-      <Title>Pomo - Alpha Version</Title>
+      <Title>Focusofi - Alpha Version</Title>
     </Head>
     <NuxtPage />
   </div>

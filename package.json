@@ -4,7 +4,10 @@
   "license": "ISC",
   "scripts": {
     "web:dev": "pnpm --filter @pomo/web dev",
-    "web:build": "pnpm --filter @pomo/web build"
+    "web:build": "pnpm --filter @pomo/web build",
+    "server:start": "dart apps/server/bin/pomo_server.dart",
+    "server:migrate": "dart apps/server/bin/pomo_server.dart migrate",
+    "server:seed": "dart apps/server/bin/pomo_server.dart seed"
   },
   "packageManager": "pnpm@10.6.0"
 }
