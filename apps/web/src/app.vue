@@ -15,6 +15,7 @@ await callOnce(async () => {
 onMounted(async () => {
   if (!settingsStore.hasFetched) {
     await settingsStore.getSettings(fetch)
+    await timerStore.getTimer(fetch)
   }
 })
 </script>
