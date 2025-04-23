@@ -60,7 +60,7 @@ jobs:
         with:
           name: ${{ env.IMAGE_NAME }}
           file: ./apps/server/compose.yml
-          host: ${{ vars.SERVER_URL }}
+          host: ${{ secrets.SERVER_HOST }}
           user: ${{ vars.DEPLOYMENT_USER }}
           ssh_key: ${{ secrets.DEPLOYMENT_USER_SSH_KEY }}
           env_file: ./env-file
