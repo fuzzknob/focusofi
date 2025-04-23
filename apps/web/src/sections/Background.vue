@@ -7,7 +7,7 @@ const { data } = await useApi<Background>('/background')
 const image = ref(data.value?.img ?? '/1.gif')
 
 async function refetchImage() {
-  const { img } = await api('/background')
+  const { img } = await api<Background>('/background')
   const imageElement = new Image()
   imageElement.onload = () => {
     image.value = img ?? ''
@@ -23,6 +23,12 @@ onMounted(() => {
 </script>
 
 <template>
+  <Head>
+    <Link
+      prefetch
+      :href="image"
+    />
+  </Head>
   <div
     class="fixed inset-0"
     :style="{ background: `url(${image}) no-repeat`, backgroundSize: 'cover' }"
