@@ -26,8 +26,7 @@ async function handleAdd() {
         img: newImage,
       },
     })
-    backgrounds.value = [background].concat(backgrounds.value)
-    // backgrounds.value?.push(background)
+    backgrounds.value = [background].concat(backgrounds.value ?? [])
     newImg.value = ''
   }
   catch (e) {
