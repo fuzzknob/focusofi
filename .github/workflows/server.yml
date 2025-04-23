@@ -2,10 +2,10 @@ name: Deploy Server
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'apps/server/**'
-      - '.github/workflows/server.yml'
+      - "apps/server/**"
+      - ".github/workflows/server.yml"
 
 env:
   REGISTRY: ghcr.io
