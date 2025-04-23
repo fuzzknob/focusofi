@@ -53,6 +53,7 @@ jobs:
           echo "BASE_HOST_URL=${{ vars.BASE_HOST_URL }}" >> ./env-file
           echo "COOKIE_SECRET=${{ secrets.COOKIE_SECRET }}" >> ./env-file
           echo "SERVER_URL=${{ vars.SERVER_URL }}" >> ./env-file
+          echo "SERVER_DATABASE_DIRECTORY=${{ vars.SERVER_DATABASE_DIRECTORY }}" >> ./env-file
           echo "IMAGE=ghcr.io/fuzzknob/${{ env.IMAGE_NAME }}:${{ github.sha }}" >> ./env-file
 
       - name: Docker stack deploy
