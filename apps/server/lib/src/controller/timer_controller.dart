@@ -4,6 +4,9 @@ import 'package:lucore/lucore.dart';
 import 'package:acanthis/acanthis.dart' as acanthis;
 
 import '../libs/utils.dart';
+import '../libs/events/event_bus.dart';
+
+import '../events/timer_event.dart';
 import '../middlewares/auth_middlwares.dart';
 import '../services/timer_service.dart' as timer_service;
 
@@ -119,6 +122,22 @@ Future<Response> endBreak(Request req) async {
   return res.message('Break ended');
 }
 
+Response events(Request req) {
+  final user = getUserOrThrow(req);
+
+  return res.streamEvent((stream) async {
+    final sub = eventBus.listen<TimerEvent>((event) {
+      if (user.id != event.userId) return;
+
+      stream.sendJson(event.toJson());
+    });
+
+    stream.onClose(() async {
+      sub.cancel();
+    });
+  });
+}
+
 DateTime _pDT(String result) => DateTime.parse(result);
 
 Router timerRoutes() {
@@ -129,5 +148,6 @@ Router timerRoutes() {
       .post('/reset', reset)
       .post('/pause', pause)
       .post('/resume', resume)
-      .post('/end-break', endBreak);
+      .post('/end-break', endBreak)
+      .get('/events', events);
 }

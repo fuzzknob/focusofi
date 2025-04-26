@@ -1,21 +1,65 @@
 <script lang="ts" setup>
 import { getMilliseconds } from 'date-fns'
 
+import { isEqual } from 'lodash'
 import Time from './components/Time.vue'
 import Report from './components/Report.vue'
 import Button from '@/components/ButtonSquare.vue'
 
-import { TimerStatus } from '@/types/types'
+import { TimerStatus, TimerAction, type SseEvent } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
 
+const user = useUser()
+const runtimeConfig = useRuntimeConfig()
 const timerStore = useTimerStore()
 const { status } = storeToRefs(timerStore)
 
 let timeout: NodeJS.Timeout | number | null = null
 let expectedTimeout: number | null = null
+let eventSource: EventSource | null = null
 
 onMounted(() => {
   adjustTimer()
+})
+
+onMounted(() => {
+  if (user == null) return
+
+  eventSource = new EventSource(`${runtimeConfig.public.apiBase}/timer/events`, {
+    withCredentials: true,
+  })
+
+  eventSource.addEventListener('message', ({ data }) => {
+    console.log('this is something', { data })
+
+    if (data == null) return
+
+    const { action, timer } = JSON.parse(data) as SseEvent
+
+    if (action === TimerAction.Reset) {
+      timerStore.reset({ noSend: true })
+      return
+    }
+
+    if (
+      timerStore.startTime
+      && isEqual(timerStore.startTime, timer.startTime)
+      && timerStore.status === timer.status
+    ) {
+      return
+    }
+
+    clearTimeInterval()
+
+    timerStore.setTimer(timer)
+
+    adjustTimer()
+  })
+})
+
+onUnmounted(() => {
+  eventSource?.close()
+  eventSource = null
 })
 
 function adjustTimer() {

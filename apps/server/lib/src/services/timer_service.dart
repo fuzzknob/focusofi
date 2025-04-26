@@ -2,6 +2,7 @@ import 'package:lucore/lucore.dart';
 
 import '../models/timer.dart';
 import '../models/settings.dart';
+import '../events/timer_event.dart';
 
 import 'settings_service.dart' as settings_service;
 import 'history_service.dart' as history_service;
@@ -55,7 +56,11 @@ Future<Timer> startTimer({
     workTillStatusChange: 0,
   );
 
-  // TODO: Send event
+  TimerEvent(
+    action: TimerAction.start,
+    userId: userId,
+    timer: timer,
+  ).dispatch();
 
   return timer;
 }
@@ -87,7 +92,7 @@ Future<Timer> stopTimer({
     userId: userId,
   );
 
-  // TODO: send event
+  TimerEvent(action: TimerAction.stop, userId: userId, timer: timer).dispatch();
 
   return timer;
 }
@@ -101,7 +106,11 @@ Future<Timer> resetTimer({required int userId}) async {
 
   await timer.delete();
 
-  // TODO: send event
+  TimerEvent(
+    action: TimerAction.reset,
+    userId: userId,
+    timer: timer,
+  ).dispatch();
 
   return timer;
 }
@@ -127,7 +136,11 @@ Future<Timer> pauseTimer({
 
   await timer.save();
 
-  // TODO: send event
+  TimerEvent(
+    action: TimerAction.pause,
+    userId: userId,
+    timer: timer,
+  ).dispatch();
 
   return timer;
 }
@@ -148,7 +161,11 @@ Future<Timer> resumeTimer({
 
   await timer.save();
 
-  // TODO: send event
+  TimerEvent(
+    action: TimerAction.resume,
+    userId: userId,
+    timer: timer,
+  ).dispatch();
 
   return timer;
 }
@@ -173,6 +190,12 @@ Future<Timer> endBreak({
   timer.breakTillStatusChange = totalBreakTime;
 
   await timer.save();
+
+  TimerEvent(
+    action: TimerAction.endBreak,
+    userId: userId,
+    timer: timer,
+  ).dispatch();
 
   return timer;
 }
