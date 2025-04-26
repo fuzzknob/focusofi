@@ -1,6 +1,6 @@
 import type { H3Event$Fetch } from 'nitropack/types'
 
-export enum TimerEvent {
+export enum TimerAction {
   Start = 'START',
   Stop = 'STOP',
   Pause = 'PAUSE',
@@ -19,8 +19,8 @@ export enum TimerStatus {
 }
 
 export interface SseEvent {
-  event: TimerEvent
-  timer?: Timer
+  action: TimerAction
+  timer: Timer
 }
 
 export interface Timer {

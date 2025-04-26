@@ -5,7 +5,7 @@ import 'package:pomo_mobile/libs/utils.dart';
 import 'package:pomo_mobile/providers/storage.dart';
 import 'package:pomo_mobile/services/auth_service.dart';
 
-const authTokenKey = 'POMO_AUTH_TOKEN';
+const authTokenKey = 'FOCUSOFI_AUTH_TOKEN';
 
 final authTokenProvider = StateProvider<String?>((ref) => '');
 

@@ -6,11 +6,11 @@ import 'package:gap/gap.dart';
 
 import 'package:pomo_mobile/libs/utils.dart';
 import 'package:pomo_mobile/models/timer/timer.dart';
+import 'package:pomo_mobile/providers/background.dart';
 import 'package:pomo_mobile/providers/timer.dart';
 import 'package:pomo_mobile/ui/widgets/account.dart';
 
 import '../layouts/main_layout.dart';
-// import 'login_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -56,6 +56,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   void _refresh() async {
     await ref.read(getTimerProvider)();
+    await ref.read(getBackgroundServiceProvider)();
     _initlizeTimer();
   }
 
