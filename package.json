@@ -7,7 +7,8 @@
     "web:build": "pnpm --filter @pomo/web build",
     "server:start": "dart apps/server/bin/pomo_server.dart",
     "server:migrate": "dart apps/server/bin/pomo_server.dart migrate",
-    "server:seed": "dart apps/server/bin/pomo_server.dart seed"
+    "server:seed": "dart apps/server/bin/pomo_server.dart seed",
+    "server:build": "dart compile exe apps/server/bin/pomo_server.dart -o ./build/focusofi"
   },
   "packageManager": "pnpm@10.6.0"
 }
