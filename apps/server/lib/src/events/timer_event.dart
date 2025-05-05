@@ -1,12 +1,11 @@
-import 'package:pomo_server/src/libs/events/event.dart';
-import 'package:pomo_server/src/models/timer.dart';
+import 'dart:convert';
 
-class TimerEvent extends Event {
-  const TimerEvent({
-    required this.action,
-    required this.userId,
-    required this.timer,
-  });
+import '../libs/events/event.dart';
+import '../libs/events/broadcastable.dart';
+import '../models/timer.dart';
+
+class TimerEvent extends Event implements Broadcastable {
+  TimerEvent({required this.action, required this.userId, required this.timer});
 
   final TimerAction action;
   final int userId;
@@ -17,6 +16,20 @@ class TimerEvent extends Event {
     'userId': userId,
     'timer': timer.toJson(),
   };
+
+  factory TimerEvent.fromJson(Map<String, dynamic> json) => TimerEvent(
+    action: TimerAction.parse(json['action']),
+    userId: json['userId'] as int,
+    timer: Timer.fromJson(json['timer']),
+  );
+
+  @override
+  final String eventName = 'timer-event';
+
+  @override
+  String serialize() {
+    return json.encode(toJson());
+  }
 }
 
 enum TimerAction {
@@ -41,7 +54,7 @@ enum TimerAction {
     };
   }
 
-  TimerAction parse(String action) {
+  factory TimerAction.parse(String action) {
     return switch (action) {
       ('START') => TimerAction.start,
       ('STOP') => TimerAction.stop,

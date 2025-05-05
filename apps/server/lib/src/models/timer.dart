@@ -56,13 +56,30 @@ class Timer implements Model {
 
   Map<String, Object?> toJson() {
     return {
+      'id': id,
       'startTime': startTime.toUtc().toIso8601String(),
+      'timerStartedAt': timerStartedAt.toUtc().toIso8601String(),
       'status': status.value,
       'successionCount': successionCount,
       'elapsedPrePause': elapsedPrePause,
-      'totalWorkTime': workTillStatusChange,
       'totalBreakTime': breakTillStatusChange,
+      'totalWorkTime': workTillStatusChange,
+      'userId': userId,
     };
+  }
+
+  factory Timer.fromJson(Map<String, Object?> json) {
+    return Timer(
+      id: json['id'] as int,
+      startTime: DateTime.parse(json['startTime'] as String),
+      timerStartedAt: DateTime.parse(json['startTime'] as String),
+      status: TimerStatus.fromString(json['status'] as String),
+      successionCount: json['successionCount'] as int,
+      elapsedPrePause: json['elapsedPrePause'] as int,
+      breakTillStatusChange: json['totalBreakTime'] as int,
+      workTillStatusChange: json['totalWorkTime'] as int,
+      userId: json['userId'] as int,
+    );
   }
 }
 

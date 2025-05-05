@@ -94,3 +94,11 @@ CREATE TABLE IF NOT EXISTS `histories` (
     `updated_at` integer DEFAULT (unixepoch ()) NOT NULL,
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE no action ON DELETE cascade
 );
+
+CREATE TABLE IF NOT EXISTS `global_events` (
+    `id` integer PRIMARY KEY NOT NULL,
+    `name` text NOT NULL,
+    `payload` text,
+    `created_at` integer DEFAULT (unixepoch ()) NOT NULL,
+    `updated_at` integer DEFAULT (unixepoch ()) NOT NULL
+);
