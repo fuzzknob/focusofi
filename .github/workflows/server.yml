@@ -60,7 +60,7 @@ jobs:
         uses: cssnr/stack-deploy-action@v1
         with:
           name: ${{ env.IMAGE_NAME }}
-          file: ./apps/server/compose.yml
+          file: ./apps/server/deploy/compose.yml
           host: ${{ secrets.SERVER_HOST }}
           user: ${{ vars.DEPLOYMENT_USER }}
           ssh_key: ${{ secrets.DEPLOYMENT_USER_SSH_KEY }}
