@@ -47,6 +47,7 @@ class EventBus {
   }
 
   dispatch(Event event) {
+    controller.add(event);
     if (event is Broadcastable) {
       final broadcastable = event as Broadcastable;
 
@@ -56,8 +57,6 @@ class EventBus {
           broadcastable.serialize(),
         );
       }
-    } else {
-      controller.add(event);
     }
   }
 }

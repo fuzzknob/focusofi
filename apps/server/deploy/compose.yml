@@ -23,7 +23,7 @@ services:
       - traefik_network
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       update_config:
         order: start-first
 
