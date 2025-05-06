@@ -15,19 +15,24 @@ export const useSettingsStore = defineStore('settings', {
   actions: {
     async getSettings(fetch: Fetch) {
       const user = useUser()
+
       let settings: Settings | null = null
+
       if (user.value) {
         settings = await getSettingsFromServer(fetch)
       }
       else if (import.meta.client) {
         settings = getSettingsFromLocalStorage()
       }
+
       if (!settings) return
+
       this.workLength = settings.workLength
       this.shortBreakLength = settings.shortBreakLength
       this.longBreakLength = settings.longBreakLength
       this.breakSuccessions = settings.breakSuccessions
       this.hasFetched = true
+
       return settings
     },
   },
