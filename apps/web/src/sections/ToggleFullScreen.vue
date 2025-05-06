@@ -1,30 +1,21 @@
 <script lang="ts" setup>
-const isFullScreen = ref(false)
+const { isFullscreen, toggle } = useFullscreen()
+const { f } = useMagicKeys()
 
-onMounted(() => {
-  document.body.addEventListener('fullscreenchange', () => {
-    isFullScreen.value = !!document.fullscreenElement
-  })
+watch(f, () => {
+  toggle()
 })
-
-async function toggleFullScreen() {
-  if (document.fullscreenElement) {
-    await document.exitFullscreen()
-    return
-  }
-  await document.body.requestFullscreen()
-}
 </script>
 
 <template>
   <button
     class="cursor-pointer"
-    @click="toggleFullScreen"
+    @click="toggle"
   >
     <div class="icon">
       <img
         class="w-full"
-        :src="isFullScreen ? '/assets/contract.png': '/assets/expand.png'"
+        :src="isFullscreen ? '/assets/contract.png': '/assets/expand.png'"
       >
     </div>
   </button>
