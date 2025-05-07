@@ -20,7 +20,7 @@ const style = computed(() => {
     :type="type"
     :disabled="disabled"
     :class="style"
-    class="text-white px-4 py-1 cursor-pointer disabled:cursor-default"
+    class="text-white px-4 py-1 disabled:cursor-default"
   >
     <slot />
   </button>

@@ -4,7 +4,6 @@ import { differenceInSeconds, addSeconds, subSeconds } from 'date-fns'
 import { useSettingsStore } from './settings'
 import { TimerStatus } from '@/types/types'
 import type { Fetch, Timer } from '@/types/types'
-import { notifyLongBreak, notifyShortBreak, notifyWorkStart } from '@/services/notification'
 import { fetchTimer, startTimer, pauseTimer, resumeTimer, endBreak, stopTimer, resetTimer } from '~/services/timer'
 
 export const useTimerStore = defineStore('timer', {
@@ -33,14 +32,10 @@ export const useTimerStore = defineStore('timer', {
           if (successionCount <= 1) {
             this.status = TimerStatus.LongBreak
             this.successionCount = settings.breakSuccessions
-
-            notifyLongBreak()
           }
           else {
             this.status = TimerStatus.ShortBreak
             this.successionCount -= 1
-
-            notifyShortBreak()
           }
 
           this.startTime = addSeconds(startTime, settings.workLength)
@@ -59,8 +54,6 @@ export const useTimerStore = defineStore('timer', {
       if (status === TimerStatus.LongBreak || status === TimerStatus.ShortBreak) {
         if (time <= 0) {
           this.status = TimerStatus.Working
-
-          notifyWorkStart()
 
           this.startTime = addSeconds(
             startTime, status === TimerStatus.LongBreak ? settings.longBreakLength : settings.shortBreakLength,

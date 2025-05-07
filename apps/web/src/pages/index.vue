@@ -2,8 +2,9 @@
 import Timer from '~/sections/Timer/Timer.vue'
 // import Clock from '~/sections/Clock/Clock.vue'
 import Background from '~/sections/Background.vue'
-import ToggleFullScreen from '~/sections/ToggleFullScreen.vue'
-import Account from '~/sections/Account.vue'
+import TopRightWidgets from '~/sections/TopRightWidgets.vue'
+import BottomLeftWidgets from '~/sections/BottomLeftWidgets.vue'
+import BottomRightWidgets from '~/sections/BottomRightWidgets.vue'
 
 useHead({
   link: [
@@ -29,11 +30,12 @@ useHead({
 <template>
   <main class="h-screen w-screen bg-black text-white flex-center">
     <Background />
-    <Account class="fixed top-5 right-5" />
+    <TopRightWidgets />
     <div class="absolute flex flex-col">
       <!-- <Clock /> -->
       <Timer />
     </div>
-    <ToggleFullScreen class="absolute z-20 text-8xl bottom-5 right-5" />
+    <BottomLeftWidgets />
+    <BottomRightWidgets />
   </main>
 </template>

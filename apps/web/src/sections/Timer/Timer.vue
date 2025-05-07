@@ -30,8 +30,6 @@ onMounted(() => {
   })
 
   eventSource.addEventListener('message', ({ data }) => {
-    console.log('this is something', { data })
-
     if (data == null) return
 
     const { action, timer } = JSON.parse(data) as SseEvent

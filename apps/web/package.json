@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.0",
     "@nuxt/fonts": "0.10.3",
     "@nuxthub/core": "0.8.17",
     "@pinia/nuxt": "0.9.0",
@@ -24,6 +25,7 @@
     "lodash": "^4.17.21",
     "nuxt": "^3.16.2",
     "pinia": "^2.3.1",
+    "reka-ui": "^2.2.1",
     "tailwindcss": "^4.1.4",
     "vee-validate": "^4.15.0",
     "vue": "latest",

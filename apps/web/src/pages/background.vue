@@ -77,7 +77,7 @@ async function handleDelete(id: number) {
       >
         <div class="flex-center w-full h-full text-white bg-black/30 opacity-0 hover:opacity-100">
           <button
-            class="text-2xl cursor-pointer"
+            class="text-2xl"
             @click="() => handleDelete(background.id)"
           >
             DELETE

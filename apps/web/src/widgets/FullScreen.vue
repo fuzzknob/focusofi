@@ -9,7 +9,7 @@ watch(f, () => {
 
 <template>
   <button
-    class="cursor-pointer"
+    :title="isFullscreen ? 'Exit Fullscreen (F)' : 'Enter Fullscreen (F)'"
     @click="toggle"
   >
     <div class="icon">
