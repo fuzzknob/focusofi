@@ -6,7 +6,7 @@ const { variant = 'primary' } = defineProps<{
 
 <template>
   <button
-    class="flex-center cursor-pointer px-3 mx-2 leading-6"
+    class="flex-center px-3 mx-2 leading-6"
     :class="`button-${variant}`"
   >
     <slot />
