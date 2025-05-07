@@ -32,6 +32,8 @@ onMounted(() => {
   const audioElement = audio.value
   if (audioElement == null) return
 
+  audioElement.volume = 0.5
+
   audioElement.muted = notificationState.value.mute
 })
 
