@@ -4,7 +4,7 @@ import { getMilliseconds } from 'date-fns'
 import { isEqual } from 'lodash'
 import Time from './components/Time.vue'
 import Report from './components/Report.vue'
-import Button from '@/components/ButtonSquare.vue'
+import Button from '@/components/Button.vue'
 
 import { TimerStatus, TimerAction, type SseEvent } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
