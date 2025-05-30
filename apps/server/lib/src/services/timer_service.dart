@@ -1,5 +1,6 @@
 import 'package:lucore/lucore.dart';
 
+import '../libs/utils.dart';
 import '../models/timer.dart';
 import '../models/settings.dart';
 import '../events/timer_event.dart';
@@ -200,11 +201,78 @@ Future<Timer> endBreak({
   return timer;
 }
 
+Future<Timer?> calibrateTimerToNewSettings(
+  int userId,
+  Settings settings,
+  Settings oldSettings,
+) async {
+  Timer? timer = await getTimer(userId, calculateCurrentState: false);
+
+  if (timer == null) return null;
+
+  final now = DateTime.now();
+
+  timer = calculateCurrentTimerStatus(
+    timer: timer,
+    settings: oldSettings,
+    now: now,
+  );
+
+  if (timer.status == TimerStatus.paused) {
+    return timer;
+  }
+
+  final timePassed = now.difference(timer.startTime);
+  final statusLength = getStatusLength(timer.status, settings);
+  final timerCount = statusLength - timePassed.inSeconds;
+
+  if (timerCount >= 0) {
+    await timer.save();
+
+    return timer;
+  }
+
+  timer.startTime = now;
+
+  if (timer.status == TimerStatus.shortBreak) {
+    timer.status = TimerStatus.working;
+    timer.breakTillStatusChange += settings.shortBreakLength + timerCount.abs();
+
+    await timer.save();
+
+    return timer;
+  }
+
+  if (timer.status == TimerStatus.longBreak) {
+    timer.status = TimerStatus.working;
+    timer.breakTillStatusChange += settings.longBreakLength + timerCount.abs();
+
+    await timer.save();
+
+    return timer;
+  }
+
+  if (timer.successionCount <= 1) {
+    timer.status = TimerStatus.longBreak;
+    timer.successionCount = settings.breakSuccessions;
+  } else {
+    timer.status = TimerStatus.shortBreak;
+    timer.successionCount -= 1;
+  }
+
+  timer.workTillStatusChange += settings.workLength + timerCount.abs();
+
+  await timer.save();
+
+  return timer;
+}
+
 Timer calculateCurrentTimerStatus({
   required Timer timer,
   required Settings settings,
+  DateTime? now,
 }) {
-  final now = DateTime.now();
+  now ??= DateTime.now();
 
   while (true) {
     if (timer.status == TimerStatus.working) {

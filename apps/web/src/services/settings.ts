@@ -9,7 +9,7 @@ const DEFAULT_SETTINGS = {
   breakSuccessions: 4,
 }
 
-export async function getSettingsFromServer(fetch: Fetch): Promise<Settings | null> {
+export async function fetchSettingsFromServer(fetch: Fetch): Promise<Settings | null> {
   try {
     const data = await fetch<Settings>('/settings')
     return data
@@ -20,11 +20,22 @@ export async function getSettingsFromServer(fetch: Fetch): Promise<Settings | nu
   return null
 }
 
-export function getSettingsFromLocalStorage(): Settings {
+export function fetchSettingsFromLocalStorage(): Settings {
   const settings = localStorage.getItem(SETTINGS_KEY)
   if (settings) {
     return JSON.parse(settings)
   }
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
   return DEFAULT_SETTINGS
+}
+
+export async function storeSettingsInServer(settings: Settings) {
+  await api('/settings', {
+    method: 'PUT',
+    body: settings,
+  })
+}
+
+export async function storeSettingsInLocalStorage(settings: Settings) {
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
 }

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import { TimerStatus } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
 
@@ -10,10 +9,10 @@ const notificationState = useCookie('notification-audio', {
 const audio = useTemplateRef('notification-audio')
 
 const timerStore = useTimerStore()
-const { time, status } = storeToRefs(timerStore)
+const { time, status, previousStatus } = storeToRefs(timerStore)
 
 watch(time, (_, prev) => {
-  if (prev != 0) return
+  if (prev != 0 || previousStatus.value === TimerStatus.Idle) return
 
   const audioElement = audio.value
 
@@ -30,6 +29,7 @@ watch(time, (_, prev) => {
 
 onMounted(() => {
   const audioElement = audio.value
+
   if (audioElement == null) return
 
   audioElement.volume = 0.5
@@ -56,20 +56,19 @@ function getNotificationSound() {
 
 <template>
   <button
+    class="flex"
     :title="notificationState.mute ? 'Unmute': 'Mute'"
     @click="toggleMute"
   >
     <Icon
       v-if="notificationState.mute"
-      icon="memory:volume-mute"
-      width="28"
-      :ssr="true"
+      name="memory:volume-mute"
+      size="30"
     />
     <Icon
       v-else
-      icon="memory:volume-high"
-      width="28"
-      :ssr="true"
+      name="memory:volume-high"
+      size="30"
     />
     <audio
       ref="notification-audio"

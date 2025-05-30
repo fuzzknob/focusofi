@@ -10,6 +10,7 @@ export const useTimerStore = defineStore('timer', {
   state: () => ({
     time: 0,
     status: TimerStatus.Idle,
+    previousStatus: TimerStatus.Idle,
     successionCount: 0,
     startTime: null as Date | null,
     elapsedPrePause: 0,
@@ -30,11 +31,11 @@ export const useTimerStore = defineStore('timer', {
       if (status === TimerStatus.Working) {
         if (time <= 0) {
           if (successionCount <= 1) {
-            this.status = TimerStatus.LongBreak
+            this.changeStatus(TimerStatus.LongBreak)
             this.successionCount = settings.breakSuccessions
           }
           else {
-            this.status = TimerStatus.ShortBreak
+            this.changeStatus(TimerStatus.ShortBreak)
             this.successionCount -= 1
           }
 
@@ -53,7 +54,7 @@ export const useTimerStore = defineStore('timer', {
       }
       if (status === TimerStatus.LongBreak || status === TimerStatus.ShortBreak) {
         if (time <= 0) {
-          this.status = TimerStatus.Working
+          this.changeStatus(TimerStatus.Working)
 
           this.startTime = addSeconds(
             startTime, status === TimerStatus.LongBreak ? settings.longBreakLength : settings.shortBreakLength,
@@ -94,7 +95,8 @@ export const useTimerStore = defineStore('timer', {
         length = settings.shortBreakLength
       }
       if (status === TimerStatus.Paused) {
-        this.time = settings.workLength - this.elapsedPrePause
+        const time = settings.workLength - this.elapsedPrePause
+        this.time = time < 0 ? 0 : time
         return
       }
 
@@ -104,9 +106,15 @@ export const useTimerStore = defineStore('timer', {
       )
     },
 
+    changeStatus(status: TimerStatus) {
+      this.previousStatus = this.status
+      this.status = status
+    },
+
     async reset(option?: { noSend: boolean }) {
       this.time = 0
       this.status = TimerStatus.Idle
+      this.previousStatus = TimerStatus.Idle
       this.successionCount = 0
       this.startTime = null
       this.elapsedPrePause = 0
@@ -125,7 +133,8 @@ export const useTimerStore = defineStore('timer', {
     async start() {
       const settings = useSettingsStore()
 
-      this.status = TimerStatus.Working
+      this.changeStatus(TimerStatus.Working)
+
       this.successionCount = settings.breakSuccessions
       this.startTime = new Date()
       this.time = settings.workLength
@@ -138,7 +147,7 @@ export const useTimerStore = defineStore('timer', {
     },
 
     async stop() {
-      this.status = TimerStatus.Stopped
+      this.changeStatus(TimerStatus.Stopped)
 
       const user = useUser()
 
@@ -156,7 +165,8 @@ export const useTimerStore = defineStore('timer', {
     async pause() {
       const settings = useSettingsStore()
 
-      this.status = TimerStatus.Paused
+      this.changeStatus(TimerStatus.Paused)
+
       this.elapsedPrePause = settings.workLength - this.time
 
       const user = useUser()
@@ -172,9 +182,15 @@ export const useTimerStore = defineStore('timer', {
     },
 
     async resume() {
-      this.startTime = subSeconds(new Date(), this.elapsedPrePause)
+      const settings = useSettingsStore()
+
+      this.startTime = settings.workLength < this.elapsedPrePause
+        ? subSeconds(new Date(), settings.workLength)
+        : subSeconds(new Date(), this.elapsedPrePause)
+
       this.elapsedPrePause = 0
-      this.status = TimerStatus.Working
+
+      this.changeStatus(TimerStatus.Working)
 
       const user = useUser()
 
@@ -184,9 +200,10 @@ export const useTimerStore = defineStore('timer', {
     },
 
     async endBreak() {
-      // const settings = useSettingsStore()
       const { successionCount } = this
-      this.status = TimerStatus.Working
+
+      this.changeStatus(TimerStatus.Working)
+
       this.startTime = new Date()
 
       this.calculateTime()
@@ -215,6 +232,7 @@ export const useTimerStore = defineStore('timer', {
 
     setTimer(timer: Timer) {
       this.status = timer.status
+      this.previousStatus = TimerStatus.Idle
       this.successionCount = timer.successionCount
       this.startTime = timer.startTime
       this.elapsedPrePause = timer.elapsedPrePause

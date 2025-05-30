@@ -1,18 +1,19 @@
 <script lang="ts" setup>
-import { getMilliseconds } from 'date-fns'
+import { getMilliseconds, isEqual } from 'date-fns'
 
-import { isEqual } from 'lodash'
 import Time from './components/Time.vue'
 import Report from './components/Report.vue'
 import Button from '@/components/Button.vue'
 
-import { TimerStatus, TimerAction, type SseEvent } from '@/types/types'
+import { TimerStatus, TimerAction, type SseEvent, type SettingsUpdatedEvent } from '@/types/types'
 import { useTimerStore } from '@/stores/timer'
 
 const user = useUser()
 const runtimeConfig = useRuntimeConfig()
 const timerStore = useTimerStore()
 const { status } = storeToRefs(timerStore)
+
+const settingStore = useSettingsStore()
 
 let timeout: NodeJS.Timeout | number | null = null
 let expectedTimeout: number | null = null
@@ -25,11 +26,11 @@ onMounted(() => {
 onMounted(() => {
   if (user == null) return
 
-  eventSource = new EventSource(`${runtimeConfig.public.apiBase}/timer/events`, {
+  eventSource = new EventSource(`${runtimeConfig.public.apiBase}/events`, {
     withCredentials: true,
   })
 
-  eventSource.addEventListener('message', ({ data }) => {
+  eventSource.addEventListener('timer-event', ({ data }: MessageEvent) => {
     if (data == null) return
 
     const { action, timer } = JSON.parse(data) as SseEvent
@@ -46,6 +47,24 @@ onMounted(() => {
     ) {
       return
     }
+
+    clearTimeInterval()
+
+    timerStore.setTimer(timer)
+
+    adjustTimer()
+  })
+
+  eventSource.addEventListener('settings-updated-event', ({ data }: MessageEvent) => {
+    if (data == null) return
+
+    const { settings, timer } = JSON.parse(data) as SettingsUpdatedEvent
+
+    console.log(timer)
+
+    settingStore.setSettings(settings)
+
+    if (timer == null) return
 
     clearTimeInterval()
 

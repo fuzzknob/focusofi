@@ -1,7 +1,12 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 
+import {
+  fetchSettingsFromServer,
+  fetchSettingsFromLocalStorage,
+  storeSettingsInServer,
+  storeSettingsInLocalStorage,
+} from '@/services/settings'
 import { useUser } from '@/composables/useUser'
-import { getSettingsFromServer, getSettingsFromLocalStorage } from '@/services/settings'
 import type { Settings, Fetch } from '~/types/types'
 
 export const useSettingsStore = defineStore('settings', {
@@ -19,21 +24,38 @@ export const useSettingsStore = defineStore('settings', {
       let settings: Settings | null = null
 
       if (user.value) {
-        settings = await getSettingsFromServer(fetch)
+        settings = await fetchSettingsFromServer(fetch)
       }
       else if (import.meta.client) {
-        settings = getSettingsFromLocalStorage()
+        settings = fetchSettingsFromLocalStorage()
       }
 
       if (!settings) return
 
+      this.setSettings(settings)
+      this.hasFetched = true
+
+      return settings
+    },
+
+    async saveSettings(settings: Settings) {
+      const user = useUser()
+
+      if (user.value != null) {
+        await storeSettingsInServer(settings)
+      }
+      else {
+        await storeSettingsInLocalStorage(settings)
+      }
+
+      this.setSettings(settings)
+    },
+
+    setSettings(settings: Settings) {
       this.workLength = settings.workLength
       this.shortBreakLength = settings.shortBreakLength
       this.longBreakLength = settings.longBreakLength
       this.breakSuccessions = settings.breakSuccessions
-      this.hasFetched = true
-
-      return settings
     },
   },
 })

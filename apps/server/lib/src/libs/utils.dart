@@ -4,6 +4,8 @@ import 'package:acanthis/acanthis.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/user.dart';
+import '../models/settings.dart';
+import '../models/timer.dart';
 
 final _env = DotEnv(includePlatformEnvironment: true, quiet: true)
   ..load(['apps/server/.env']);
@@ -58,7 +60,7 @@ Future<Map<String, dynamic>> validate(
 User getUserOrThrow(Request req) {
   final user = req.context['user'];
   if (user == null) {
-    throw LunartException(statusCode: 401, message: 'User not found');
+    throw UnauthorizedException('User not found');
   }
   return user;
 }
@@ -71,4 +73,13 @@ Future<String?> parseSessionToken(Request req) async {
   if (authorization == null) return null;
 
   return authorization.replaceFirst('Bearer ', '');
+}
+
+int getStatusLength(TimerStatus status, Settings settings) {
+  return switch (status) {
+    (TimerStatus.working || TimerStatus.paused) => settings.workLength,
+    (TimerStatus.shortBreak) => settings.shortBreakLength,
+    (TimerStatus.longBreak) => settings.longBreakLength,
+    _ => throw InternalServerError('$status doesn\'t have status length'),
+  };
 }
