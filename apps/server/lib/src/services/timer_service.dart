@@ -201,7 +201,7 @@ Future<Timer> endBreak({
   return timer;
 }
 
-Future<Timer?> calibrateTimerToNewSettings(
+Future<Timer?> adjustTimerToNewSettings(
   int userId,
   Settings settings,
   Settings oldSettings,

@@ -39,7 +39,7 @@ Future<Settings> updateSettings(
 
   await settings.save();
 
-  final timer = await timer_service.calibrateTimerToNewSettings(
+  final timer = await timer_service.adjustTimerToNewSettings(
     userId,
     settings,
     oldSettings,
