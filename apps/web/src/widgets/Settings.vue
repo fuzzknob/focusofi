@@ -39,7 +39,7 @@ const timeFormatOption: Intl.NumberFormatOptions = {
   unitDisplay: 'narrow',
 }
 
-onMounted(() => {
+watch(isOpen, () => {
   setValues({
     workMinutes: settingStore.workLength / 60,
     shortBreakMinutes: settingStore.shortBreakLength / 60,
