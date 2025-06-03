@@ -218,7 +218,12 @@ Future<Timer?> adjustTimerToNewSettings(
     now: now,
   );
 
-  if (timer.status == TimerStatus.paused) {
+  // if it is not one of the following status then return
+  if (![
+    TimerStatus.working,
+    TimerStatus.shortBreak,
+    TimerStatus.longBreak,
+  ].contains(timer.status)) {
     return timer;
   }
 

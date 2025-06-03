@@ -60,8 +60,6 @@ onMounted(() => {
 
     const { settings, timer } = JSON.parse(data) as SettingsUpdatedEvent
 
-    console.log(timer)
-
     settingStore.setSettings(settings)
 
     if (timer == null) return

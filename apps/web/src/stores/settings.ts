@@ -7,6 +7,7 @@ import {
   storeSettingsInLocalStorage,
 } from '@/services/settings'
 import { useUser } from '@/composables/useUser'
+import { useTimerStore } from '@/stores/timer'
 import type { Settings, Fetch } from '~/types/types'
 
 export const useSettingsStore = defineStore('settings', {
@@ -49,6 +50,11 @@ export const useSettingsStore = defineStore('settings', {
       }
 
       this.setSettings(settings)
+
+      const timer = useTimerStore()
+
+      timer.adjustTimerToSettings()
+      timer.calculateTime()
     },
 
     setSettings(settings: Settings) {

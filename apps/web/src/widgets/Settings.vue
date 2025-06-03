@@ -16,7 +16,7 @@ const validationSchema = toTypedSchema(
   }),
 )
 
-const { defineField, handleSubmit, errors, meta } = useForm({
+const { defineField, handleSubmit, errors, meta, setValues } = useForm({
   initialValues: {
     workMinutes: settingStore.workLength / 60,
     shortBreakMinutes: settingStore.shortBreakLength / 60,
@@ -38,6 +38,15 @@ const timeFormatOption: Intl.NumberFormatOptions = {
   unit: 'minute',
   unitDisplay: 'narrow',
 }
+
+onMounted(() => {
+  setValues({
+    workMinutes: settingStore.workLength / 60,
+    shortBreakMinutes: settingStore.shortBreakLength / 60,
+    longBreakMinutes: settingStore.longBreakLength / 60,
+    breakSuccessions: settingStore.breakSuccessions,
+  })
+})
 
 const handleSettingsSubmit = handleSubmit(async (values) => {
   isSubmitting.value = true

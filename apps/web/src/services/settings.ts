@@ -22,9 +22,11 @@ export async function fetchSettingsFromServer(fetch: Fetch): Promise<Settings | 
 
 export function fetchSettingsFromLocalStorage(): Settings {
   const settings = localStorage.getItem(SETTINGS_KEY)
+
   if (settings) {
     return JSON.parse(settings)
   }
+
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
   return DEFAULT_SETTINGS
 }

@@ -243,6 +243,75 @@ export const useTimerStore = defineStore('timer', {
 
       this.calculateTime()
     },
+
+    getCurrentStatusLength() {
+      const settings = useSettingsStore()
+
+      if (this.status === TimerStatus.Working) {
+        return settings.workLength
+      }
+      if (this.status === TimerStatus.ShortBreak) {
+        return settings.shortBreakLength
+      }
+      if (this.status === TimerStatus.LongBreak) {
+        return settings.longBreakLength
+      }
+
+      return null
+    },
+
+    adjustTimerToSettings() {
+      const settings = useSettingsStore()
+
+      const { status, startTime } = this
+
+      if (![
+        TimerStatus.Working,
+        TimerStatus.LongBreak,
+        TimerStatus.ShortBreak,
+      ].includes(status)) {
+        return
+      }
+
+      const now = new Date()
+      const timePassed = differenceInSeconds(now, startTime!)
+      const statusLength = this.getCurrentStatusLength()
+
+      if (statusLength == null) return
+
+      const timerCount = statusLength - timePassed
+
+      if (timerCount >= 0) {
+        return
+      }
+
+      this.startTime = now
+
+      if (this.status === TimerStatus.ShortBreak) {
+        this.status = TimerStatus.Working
+        this.report.totalBreakTaken += settings.shortBreakLength + Math.abs(timerCount)
+
+        return
+      }
+
+      if (this.status === TimerStatus.LongBreak) {
+        this.status = TimerStatus.Working
+        this.report.totalBreakTaken += settings.longBreakLength + Math.abs(timerCount)
+
+        return
+      }
+
+      if (this.successionCount <= 1) {
+        this.status = TimerStatus.LongBreak
+        this.successionCount = settings.breakSuccessions
+      }
+      else {
+        this.status = TimerStatus.ShortBreak
+        this.successionCount -= 1
+      }
+
+      this.report.totalWorked += settings.workLength + Math.abs(timerCount)
+    },
   },
 })
 
