@@ -23,6 +23,11 @@ export interface SseEvent {
   timer: Timer
 }
 
+export interface SettingsUpdatedEvent {
+  settings: Settings
+  timer?: Timer
+}
+
 export interface Timer {
   startTime: Date
   status: TimerStatus

@@ -28,6 +28,22 @@ class Settings implements Model {
 
   Future<void> save() => db.save(this);
 
+  Settings copyWith({
+    int? id,
+    int? workLength,
+    int? shortBreakLength,
+    int? longBreakLength,
+    int? breakSuccessions,
+    int? userId,
+  }) => Settings(
+    id: id ?? this.id,
+    workLength: workLength ?? this.workLength,
+    shortBreakLength: shortBreakLength ?? this.shortBreakLength,
+    longBreakLength: longBreakLength ?? this.longBreakLength,
+    breakSuccessions: breakSuccessions ?? this.breakSuccessions,
+    userId: userId ?? this.userId,
+  );
+
   Map<String, Object?> toJson() {
     return {
       'workLength': workLength,

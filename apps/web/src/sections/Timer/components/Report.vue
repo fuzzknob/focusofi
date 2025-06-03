@@ -2,7 +2,7 @@
 import { useTimerStore } from '@/stores/timer'
 import { timeToText, formatSecondsToTime } from '@/libs/utils'
 
-import Button from '@/components/ButtonSquare.vue'
+import Button from '@/components/Button.vue'
 
 const timerStore = useTimerStore()
 const { report } = storeToRefs(timerStore)

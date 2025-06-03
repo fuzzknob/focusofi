@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 import { useUser } from '@/composables/useUser'
 
 const user = useUser()
@@ -14,12 +13,12 @@ async function handleLogout() {
   <button
     v-if="user"
     title="Logout"
+    class="flex"
     @click="handleLogout"
   >
     <Icon
-      icon="memory:logout"
-      width="25"
-      :ssr="true"
+      name="memory:logout"
+      size="25"
     />
   </button>
   <NuxtLink
@@ -28,9 +27,8 @@ async function handleLogout() {
     to="/login"
   >
     <Icon
-      icon="memory:login"
-      width="25"
-      :ssr="true"
+      name="memory:login"
+      size="25"
     />
   </NuxtLink>
 </template>

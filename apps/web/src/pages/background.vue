@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Button from '@/components/ButtonSquare.vue'
+import Button from '@/components/Button.vue'
 import type { Background } from '@/types/types'
 
 const newImg = ref('')

@@ -134,7 +134,7 @@ packages:
     description:
       path: "libs/lunart_core"
       ref: main
-      resolved-ref: "2c2ed0aea61098b4872b142b6d2843b51804984e"
+      resolved-ref: b4a82272f998c920d5fee06c3f0442e71dab862c
       url: "https://github.com/fuzzknob/lunart.git"
     source: git
     version: "0.0.1"
@@ -143,7 +143,7 @@ packages:
     description:
       path: "libs/lunart_express"
       ref: main
-      resolved-ref: "2c2ed0aea61098b4872b142b6d2843b51804984e"
+      resolved-ref: b4a82272f998c920d5fee06c3f0442e71dab862c
       url: "https://github.com/fuzzknob/lunart.git"
     source: git
     version: "0.0.1"
@@ -151,10 +151,10 @@ packages:
     dependency: transitive
     description:
       name: meta
-      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
+      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.0"
+    version: "1.17.0"
   mime:
     dependency: transitive
     description:

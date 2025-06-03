@@ -1,6 +1,9 @@
 import 'package:lucore/lucore.dart';
 
 import '../models/settings.dart';
+import '../events/settings_updated_event.dart';
+
+import 'timer_service.dart' as timer_service;
 
 Future<Settings> createSettings(
   int userId, {
@@ -16,6 +19,39 @@ Future<Settings> createSettings(
     longBreakLength: longBreakLength,
     breakSuccessions: breakSuccessions,
   );
+}
+
+Future<Settings> updateSettings(
+  int userId, {
+  required int workLength,
+  required int shortBreakLength,
+  required int longBreakLength,
+  required int breakSuccessions,
+}) async {
+  final settings = await getSettingsOrThrow(userId);
+
+  final oldSettings = settings.copyWith();
+
+  settings.workLength = workLength;
+  settings.shortBreakLength = shortBreakLength;
+  settings.longBreakLength = longBreakLength;
+  settings.breakSuccessions = breakSuccessions;
+
+  await settings.save();
+
+  final timer = await timer_service.adjustTimerToNewSettings(
+    userId,
+    settings,
+    oldSettings,
+  );
+
+  SettingsUpdatedEvent(
+    userId: userId,
+    settings: settings,
+    timer: timer,
+  ).dispatch();
+
+  return settings;
 }
 
 Future<Settings?> findSettings(int userId) {

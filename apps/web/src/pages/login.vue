@@ -4,7 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import zod from 'zod'
 
 import Background from '@/sections/Background.vue'
-import Button from '@/components/ButtonSquare.vue'
+import Button from '@/components/Button.vue'
 import Input from '@/components/Input.vue'
 
 const validationSchema = toTypedSchema(
