@@ -70,7 +70,10 @@ const handleSettingsSubmit = handleSubmit(async (values) => {
 
 <template>
   <DialogRoot v-model:open="isOpen">
-    <DialogTrigger class="flex">
+    <DialogTrigger
+      title="Settings"
+      class="flex"
+    >
       <Icon
         name="memory:dot-octagon"
         size="25"

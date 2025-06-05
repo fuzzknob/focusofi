@@ -49,11 +49,12 @@ export const useSettingsStore = defineStore('settings', {
         await storeSettingsInLocalStorage(settings)
       }
 
-      this.setSettings(settings)
-
       const timer = useTimerStore()
 
-      timer.adjustTimerToSettings()
+      timer.adjustTimerToSettings(settings)
+
+      this.setSettings(settings)
+
       timer.calculateTime()
     },
 
