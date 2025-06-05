@@ -30,7 +30,7 @@ class Timer implements Model {
 
   Future<void> delete() => db.delete(id!);
 
-  Future<void> save() => db.save(this);
+  Future<Timer> save() => db.save(this);
 
   Timer copyWith({
     int? id,

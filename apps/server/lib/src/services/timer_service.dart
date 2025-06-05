@@ -210,6 +210,16 @@ Future<Timer?> adjustTimerToNewSettings(
 
   if (timer == null) return null;
 
+  // if it is not one of the following status then return
+  if (![
+    TimerStatus.working,
+    TimerStatus.shortBreak,
+    TimerStatus.longBreak,
+    TimerStatus.paused,
+  ].contains(timer.status)) {
+    return timer;
+  }
+
   final now = DateTime.now();
 
   timer = calculateCurrentTimerStatus(
@@ -218,43 +228,54 @@ Future<Timer?> adjustTimerToNewSettings(
     now: now,
   );
 
-  // if it is not one of the following status then return
-  if (![
-    TimerStatus.working,
-    TimerStatus.shortBreak,
-    TimerStatus.longBreak,
-  ].contains(timer.status)) {
-    return timer;
+  final timePassed = now.difference(timer.startTime);
+
+  if (settings.breakSuccessions != oldSettings.breakSuccessions) {
+    final index = oldSettings.breakSuccessions - timer.successionCount;
+    timer.successionCount = settings.breakSuccessions - index;
   }
 
-  final timePassed = now.difference(timer.startTime);
+  if (timer.successionCount <= 0) {
+    timer.successionCount = settings.breakSuccessions;
+
+    if ([
+      TimerStatus.shortBreak,
+      TimerStatus.longBreak,
+    ].contains(timer.status)) {
+      timer.breakTillStatusChange += timePassed.inSeconds;
+    } else {
+      timer.workTillStatusChange += timePassed.inSeconds;
+    }
+
+    if (timer.status == TimerStatus.paused) {
+      timer.elapsedPrePause = 0;
+      return timer.save();
+    }
+
+    timer.startTime = now;
+    timer.status = TimerStatus.working;
+
+    return timer.save();
+  }
+
+  if (timer.status == TimerStatus.paused) {
+    return timer.save();
+  }
+
   final statusLength = getStatusLength(timer.status, settings);
   final timerCount = statusLength - timePassed.inSeconds;
 
   if (timerCount >= 0) {
-    await timer.save();
-
-    return timer;
+    return timer.save();
   }
 
   timer.startTime = now;
 
-  if (timer.status == TimerStatus.shortBreak) {
+  if ([TimerStatus.shortBreak, TimerStatus.longBreak].contains(timer.status)) {
     timer.status = TimerStatus.working;
-    timer.breakTillStatusChange += settings.shortBreakLength + timerCount.abs();
+    timer.breakTillStatusChange += timePassed.inSeconds;
 
-    await timer.save();
-
-    return timer;
-  }
-
-  if (timer.status == TimerStatus.longBreak) {
-    timer.status = TimerStatus.working;
-    timer.breakTillStatusChange += settings.longBreakLength + timerCount.abs();
-
-    await timer.save();
-
-    return timer;
+    return timer.save();
   }
 
   if (timer.successionCount <= 1) {
@@ -265,11 +286,9 @@ Future<Timer?> adjustTimerToNewSettings(
     timer.successionCount -= 1;
   }
 
-  timer.workTillStatusChange += settings.workLength + timerCount.abs();
+  timer.workTillStatusChange += timePassed.inSeconds;
 
-  await timer.save();
-
-  return timer;
+  return timer.save();
 }
 
 Timer calculateCurrentTimerStatus({

@@ -3,7 +3,7 @@ import { differenceInSeconds, addSeconds, subSeconds } from 'date-fns'
 
 import { useSettingsStore } from './settings'
 import { TimerStatus } from '@/types/types'
-import type { Fetch, Timer } from '@/types/types'
+import type { Fetch, Settings, Timer } from '@/types/types'
 import { fetchTimer, startTimer, pauseTimer, resumeTimer, endBreak, stopTimer, resetTimer } from '~/services/timer'
 
 export const useTimerStore = defineStore('timer', {
@@ -260,8 +260,8 @@ export const useTimerStore = defineStore('timer', {
       return null
     },
 
-    adjustTimerToSettings() {
-      const settings = useSettingsStore()
+    adjustTimerToSettings(settings: Settings) {
+      const oldSettings = useSettingsStore()
 
       const { status, startTime } = this
 
@@ -269,12 +269,45 @@ export const useTimerStore = defineStore('timer', {
         TimerStatus.Working,
         TimerStatus.LongBreak,
         TimerStatus.ShortBreak,
+        TimerStatus.Paused,
       ].includes(status)) {
         return
       }
 
       const now = new Date()
       const timePassed = differenceInSeconds(now, startTime!)
+
+      if (settings.breakSuccessions != oldSettings.breakSuccessions) {
+        const index = oldSettings.breakSuccessions - this.successionCount
+        this.successionCount = settings.breakSuccessions - index
+      }
+
+      if (this.successionCount <= 0) {
+        this.successionCount = settings.breakSuccessions
+
+        if ([TimerStatus.ShortBreak, TimerStatus.LongBreak].includes(this.status)) {
+          this.report.totalBreakTaken += timePassed
+        }
+        else {
+          this.report.totalWorked += timePassed
+        }
+
+        if (this.status === TimerStatus.Paused) {
+          this.elapsedPrePause = 0
+          return
+        }
+
+        this.startTime = now
+
+        this.status = TimerStatus.Working
+
+        return
+      }
+
+      if (this.status === TimerStatus.Paused) {
+        return
+      }
+
       const statusLength = this.getCurrentStatusLength()
 
       if (statusLength == null) return
@@ -287,16 +320,9 @@ export const useTimerStore = defineStore('timer', {
 
       this.startTime = now
 
-      if (this.status === TimerStatus.ShortBreak) {
+      if ([TimerStatus.ShortBreak, TimerStatus.LongBreak].includes(this.status)) {
         this.status = TimerStatus.Working
-        this.report.totalBreakTaken += settings.shortBreakLength + Math.abs(timerCount)
-
-        return
-      }
-
-      if (this.status === TimerStatus.LongBreak) {
-        this.status = TimerStatus.Working
-        this.report.totalBreakTaken += settings.longBreakLength + Math.abs(timerCount)
+        this.report.totalBreakTaken += timePassed
 
         return
       }
@@ -310,7 +336,7 @@ export const useTimerStore = defineStore('timer', {
         this.successionCount -= 1
       }
 
-      this.report.totalWorked += settings.workLength + Math.abs(timerCount)
+      this.report.totalWorked += timePassed
     },
   },
 })
