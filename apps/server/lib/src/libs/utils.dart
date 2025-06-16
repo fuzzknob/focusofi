@@ -45,7 +45,6 @@ Future<Map<String, dynamic>> validate(
     final result = parser.tryParse(body);
 
     if (!result.success) {
-      print(result.errors);
       throw BadRequestException('Invalid request', result.errors);
     }
 

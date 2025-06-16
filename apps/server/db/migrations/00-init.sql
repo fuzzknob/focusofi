@@ -1,9 +1,3 @@
-PRAGMA foreign_keys = ON;
-
-PRAGMA journal_mode = WAL;
-
-PRAGMA wal_autocheckpoint = 1000;
-
 -- users table
 CREATE TABLE IF NOT EXISTS `users` (
     `id` integer PRIMARY KEY NOT NULL,

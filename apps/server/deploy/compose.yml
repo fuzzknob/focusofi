@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
     environment:
       - PORT=8000
-      - SCHEMA_PATH=/app/db/schema.sql
+      - MIGRATION_PATH=/app/db/migrations
       - DATABASE_PATH=/data/focusofi.db
       - SEED_ASSETS_PATH=/app/assets
       - FRONT_END_URL=${FRONT_END_URL}
