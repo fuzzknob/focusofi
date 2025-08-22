@@ -40,6 +40,8 @@ Future<Response> loginWithOtp(Request req) async {
 
   final hostUrl = getEnv('BASE_HOST_URL')!;
 
+  final user = await session.user();
+
   return res
       .signedCookie(
         'authorization',
@@ -48,7 +50,7 @@ Future<Response> loginWithOtp(Request req) async {
         domain: hostUrl,
         sameSite: SameSite.none,
       )
-      .message('Successfully logged in');
+      .json(user?.toJson());
 }
 
 Future<Response> logout(Request req) async {

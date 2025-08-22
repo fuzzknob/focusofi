@@ -9,7 +9,7 @@ class SettingsRepository extends Repository<Settings> {
     required int workLength,
     required int shortBreakLength,
     required int longBreakLength,
-    required int breakSuccessions,
+    required int workSessions,
     required int userId,
   }) async {
     return save(
@@ -17,7 +17,7 @@ class SettingsRepository extends Repository<Settings> {
         workLength: workLength,
         shortBreakLength: shortBreakLength,
         longBreakLength: longBreakLength,
-        breakSuccessions: breakSuccessions,
+        workSessions: workSessions,
         userId: userId,
       ),
     );
@@ -27,7 +27,7 @@ class SettingsRepository extends Repository<Settings> {
   Settings mapToModel(Map<String, Object?> map) {
     return Settings(
       id: map['id'] as int,
-      breakSuccessions: map['break_successions'] as int,
+      workSessions: map['work_sessions'] as int,
       longBreakLength: map['long_break_length'] as int,
       shortBreakLength: map['short_break_length'] as int,
       workLength: map['work_length'] as int,
@@ -38,7 +38,7 @@ class SettingsRepository extends Repository<Settings> {
   @override
   Map<String, Object?> modelToMap(Settings model) {
     return {
-      'break_successions': model.breakSuccessions,
+      'work_sessions': model.workSessions,
       'long_break_length': model.longBreakLength,
       'short_break_length': model.shortBreakLength,
       'work_length': model.workLength,

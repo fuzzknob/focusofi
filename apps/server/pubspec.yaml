@@ -1,6 +1,6 @@
 name: pomo_server
 description: Server for pomo app.
-version: 1.0.0
+version: 1.0.0-beta.0
 publish_to: none
 
 environment:
@@ -22,6 +22,7 @@ dependencies:
   acanthis: ^1.1.0
   uuid: ^4.5.1
   dartx: ^1.2.0
+  intl: ^0.20.2
 
 dev_dependencies:
   lints: ^5.1.1

@@ -10,7 +10,7 @@ Future<void> seed(String seedName) async {
   final seed = seedRegistry[seedName];
 
   if (seed == null) {
-    throw Exception('🚫 Seeder not $seedName found');
+    throw Exception('🚫 Seeder "$seedName" not found');
   }
 
   await seed.seed();

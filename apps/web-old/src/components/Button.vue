@@ -10,6 +10,7 @@ const { type = 'button', disabled = false, variant = 'primary' } = defineProps<{
   type?: 'submit' | 'reset' | 'button'
   disabled?: boolean
 }>()
+
 const style = computed(() => {
   return variants[variant]
 })
