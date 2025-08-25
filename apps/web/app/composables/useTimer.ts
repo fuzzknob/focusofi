@@ -2,8 +2,8 @@ import { differenceInMilliseconds, getMilliseconds, subSeconds, addSeconds } fro
 
 import { useSettings } from './useSettings'
 import { useTimerServer } from './useTimerServer'
-import { BlockType, TimerState } from '@/types'
-import type { Block, Settings, Sequence } from '@/types'
+import { BlockType, TimerState, Action } from '@/types'
+import type { Block, Settings, Sequence, SSEEvent } from '@/types'
 
 export const useTimer = () => {
   const timerServer = useTimerServer()
@@ -85,43 +85,53 @@ export const useTimer = () => {
   async function stopTimer() {
     clearTimer()
 
-    timerState.value = TimerState.stopped
-
     const stopTime = new Date()
 
     // last tick before stopping
-    stateTick(stopTime)
+    if (timerState.value === TimerState.running) {
+      stateTick(stopTime)
+    }
+
+    timerState.value = TimerState.stopped
 
     if (user.value) {
       await timerServer.stopTimer(stopTime)
     }
   }
 
-  async function resetTimer() {
+  async function resetTimer(sendToServer = true) {
     timerState.value = TimerState.idle
     currentBlock.value = null
     blockIndex.value = -1
     expectedTimeout.value = null
     timeout.value = null
     seqGenCount.value = 0
+    accumulatedWork.value = 0
+    accumulatedBreak.value = 0
+    sequence.value = {
+      modified: false,
+      blocks: [],
+    }
 
     getNewSequence()
 
-    if (user.value) {
+    if (user.value && sendToServer) {
       await timerServer.resetTimer()
     }
   }
 
   async function skipBlock() {
+    const startTime = new Date()
+
     clearTimer()
+
+    stateTick(startTime)
 
     const block = currentBlock.value
 
     if (block) {
       block.completed = true
     }
-
-    const startTime = new Date()
 
     getCurrentBlock(startTime)
 
@@ -167,6 +177,10 @@ export const useTimer = () => {
 
     expectedTimeout.value = now.getTime() + interval
     timeout.value = setTimeout(timerTick, interval)
+
+    if (!user.value) {
+      return
+    }
   }
 
   // Private
@@ -245,15 +259,13 @@ export const useTimer = () => {
   }
 
   function getNewSequence() {
-    if (sequence.value != null) {
-      const { blocks } = sequence.value
-      accumulatedBreak.value += blocks
-        .filter(block => [BlockType.shortBreak, BlockType.longBreak].includes(block.type))
-        .reduce((previous, block) => previous + block.elapsed, 0)
-      accumulatedWork.value += blocks
-        .filter(block => block.type === BlockType.work)
-        .reduce((previous, block) => previous + block.elapsed, 0)
-    }
+    const { blocks } = sequence.value
+    accumulatedBreak.value += blocks
+      .filter(block => [BlockType.shortBreak, BlockType.longBreak].includes(block.type))
+      .reduce((previous, block) => previous + block.elapsed, 0)
+    accumulatedWork.value += blocks
+      .filter(block => block.type === BlockType.work)
+      .reduce((previous, block) => previous + block.elapsed, 0)
 
     sequence.value = generateSequence(settings.value!)
     seqGenCount.value++
@@ -288,6 +300,27 @@ export const useTimer = () => {
     stateTick(new Date())
   }
 
+  function syncWithEvent(event: SSEEvent) {
+    const { action, timer } = event
+
+    clearTimer()
+
+    if (action === Action.reset) {
+      resetTimer(false)
+      return
+    }
+
+    sequence.value = timer.currentSequence
+    timerState.value = timer.timerState
+    accumulatedBreak.value = timer.accumulatedBreak
+    accumulatedWork.value = timer.accumulatedWork
+    seqGenCount.value = timer.seqGenCount
+
+    getCurrentBlock()
+
+    initTimerClient()
+  }
+
   return {
     // states
     sequence,
@@ -307,6 +340,7 @@ export const useTimer = () => {
     stopTimer,
     resetTimer,
     skipBlock,
+    syncWithEvent,
 
     initTimerServer,
     initTimerClient,

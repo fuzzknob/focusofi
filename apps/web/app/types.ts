@@ -61,3 +61,8 @@ export interface Background {
   id: number
   img: string
 }
+
+export interface SSEEvent {
+  action: Action
+  timer: Timer
+}

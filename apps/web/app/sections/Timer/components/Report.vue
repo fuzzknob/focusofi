@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Button from '@/components/Button.vue'
 import { BlockType } from '@/types'
+import { timeToText, formatSecondsToTime } from '@/libs/utils'
 
 const { resetTimer, sequence, accumulatedBreak, accumulatedWork } = useTimer()
 
 const totalBreak = computed(() => {
-  console.log('calculating total break')
   const currentSeqBreak = sequence.value.blocks
     .filter(block => [BlockType.shortBreak, BlockType.shortBreak].includes(block.type))
     .reduce((previous, block) => previous + block.elapsed, 0)
@@ -14,13 +14,16 @@ const totalBreak = computed(() => {
 })
 
 const totalWork = computed(() => {
-  console.log('calculating total work')
   const currentSeqWork = sequence.value.blocks
     .filter(block => block.type === BlockType.work)
     .reduce((previous, block) => previous + block.elapsed, 0)
 
   return currentSeqWork + accumulatedWork.value
 })
+
+function formatTime(seconds: number) {
+  return timeToText(formatSecondsToTime(seconds))
+}
 </script>
 
 <template>
@@ -34,13 +37,13 @@ const totalWork = computed(() => {
           <span>
             Work Duration:
           </span>
-          <span>{{ totalWork }}</span>
+          <span>{{ formatTime(totalWork) }}</span>
         </div>
         <div class="flex justify-between">
           <span>
             Break Duration:
           </span>
-          <span>{{ totalBreak }}</span>
+          <span>{{ formatTime(totalBreak) }}</span>
         </div>
       </div>
       <div class="flex justify-center mt-6">
