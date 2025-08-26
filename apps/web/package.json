@@ -1,5 +1,5 @@
 {
-  "name": "@pomo/web",
+  "name": "@focusofi/web",
   "private": true,
   "type": "module",
   "scripts": {

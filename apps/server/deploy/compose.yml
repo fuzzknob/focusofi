@@ -1,5 +1,5 @@
 services:
-  pomoserver:
+  focusofiserver:
     image: ${IMAGE}
     labels:
       - traefik.enable=true

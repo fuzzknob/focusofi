@@ -76,4 +76,6 @@ app.*.map.json
 /playground
 /db/pomo.db
 /db/pomo.db-*
+/db/focusofi.db
+/db/focusofi.db-*
 /temp

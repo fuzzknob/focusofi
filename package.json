@@ -1,14 +1,14 @@
 {
-  "name": "pomo",
+  "name": "focusofi",
   "private": true,
   "license": "ISC",
   "scripts": {
-    "web:dev": "pnpm --filter @pomo/web dev",
-    "web:build": "pnpm --filter @pomo/web build",
-    "server:start": "dart apps/server/bin/pomo_server.dart",
-    "server:migrate": "dart apps/server/bin/pomo_server.dart migrate",
-    "server:seed": "dart apps/server/bin/pomo_server.dart seed",
-    "server:build": "dart compile exe apps/server/bin/pomo_server.dart -o ./build/focusofi"
+    "web:dev": "pnpm --filter @focusofi/web dev",
+    "web:build": "pnpm --filter @focusofi/web build",
+    "server:start": "dart apps/server/bin/focusofi.dart",
+    "server:migrate": "dart apps/server/bin/focusofi.dart migrate",
+    "server:seed": "dart apps/server/bin/focusofi.dart seed",
+    "server:build": "dart compile exe apps/server/bin/focusofi.dart -o ./build/focusofi"
   },
   "packageManager": "pnpm@10.6.0"
 }

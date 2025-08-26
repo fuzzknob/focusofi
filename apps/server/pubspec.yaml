@@ -1,5 +1,5 @@
-name: pomo_server
-description: Server for pomo app.
+name: focusofi
+description: Server for focusofi app.
 version: 1.0.0-beta.0
 publish_to: none
 

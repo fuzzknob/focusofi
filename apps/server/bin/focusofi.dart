@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:cli_util/cli_logging.dart';
 
-import 'package:pomo_server/server.dart';
-import 'package:pomo_server/database.dart';
+import 'package:focusofi/server.dart';
+import 'package:focusofi/database.dart';
 
 void main(List<String> arguments) async {
   final command = arguments.firstOrNull;

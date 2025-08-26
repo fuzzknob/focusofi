@@ -1,6 +1,6 @@
 import 'package:lucore/lucore.dart';
 import 'package:acanthis/acanthis.dart' as acanthis;
-import 'package:pomo_server/src/middlewares/auth_middlwares.dart';
+import 'package:focusofi/src/middlewares/auth_middlwares.dart';
 
 import '../libs/utils.dart';
 import '../services/auth_service.dart' as auth_service;
