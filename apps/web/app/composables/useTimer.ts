@@ -2,11 +2,13 @@ import { differenceInMilliseconds, getMilliseconds, subSeconds, addSeconds } fro
 
 import { useSettings } from './useSettings'
 import { useTimerServer } from './useTimerServer'
+import { useNotification } from './useNotification'
 import { BlockType, TimerState, Action } from '@/types'
 import type { Block, Settings, Sequence, SSEEvent } from '@/types'
 
 export const useTimer = () => {
   const timerServer = useTimerServer()
+  const { notify } = useNotification()
 
   const sequence = useState<Sequence>('sequence', () => ({
     modified: false,
@@ -135,6 +137,8 @@ export const useTimer = () => {
 
     getCurrentBlock(startTime)
 
+    timerState.value = TimerState.running
+
     timerTick()
 
     if (user.value) {
@@ -204,6 +208,7 @@ export const useTimer = () => {
   }
 
   function stateTick(now: Date) {
+    console.log('tick tick')
     const block = currentBlock.value
     if (block == null) return
 
@@ -220,6 +225,8 @@ export const useTimer = () => {
 
       getCurrentBlock(addSeconds(startTime, block.length))
 
+      notify(currentBlock.value!.type)
+
       return
     }
 
@@ -230,11 +237,7 @@ export const useTimer = () => {
     const blocks = sequence.value.blocks
 
     for (const index in blocks) {
-      const block = blocks[index]
-
-      if (block == null) {
-        throw Error('Logic error')
-      }
+      const block = blocks[index]!
 
       if (block.completed) {
         continue

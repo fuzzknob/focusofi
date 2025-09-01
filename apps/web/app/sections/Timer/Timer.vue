@@ -12,7 +12,7 @@ const actionButtons = computed(() => {
   }
 
   if (timerState.value === TimerState.paused) {
-    return [Action.resume, Action.stop]
+    return [Action.resume, Action.skip, Action.stop]
   }
 
   if (timerState.value === TimerState.stopped) {
@@ -22,10 +22,10 @@ const actionButtons = computed(() => {
   const blockType = currentBlock.value!.type
 
   if (blockType === BlockType.longBreak || blockType === BlockType.shortBreak) {
-    return [Action.endBreak, Action.stop]
+    return [Action.skip, Action.stop]
   }
 
-  return [Action.pause, Action.stop]
+  return [Action.pause, Action.skip, Action.stop]
 })
 </script>
 
@@ -47,11 +47,11 @@ const actionButtons = computed(() => {
         </Button>
 
         <Button
-          v-if="action === Action.endBreak"
-          class="px-5 py-1"
+          v-if="action === Action.skip"
+          class="flex items-center"
           @click="skipBlock"
         >
-          END BREAK
+          SKIP
         </Button>
 
         <Button

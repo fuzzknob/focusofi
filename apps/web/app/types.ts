@@ -17,6 +17,7 @@ export enum Action {
   reset = 'RESET',
   pause = 'PAUSE',
   endBreak = 'END_BREAK',
+  skip = 'SKIP',
   resume = 'RESUME',
 }
 

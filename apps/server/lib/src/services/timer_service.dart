@@ -198,6 +198,8 @@ Future<Timer> skipBlock({required DateTime time, required int userId}) async {
 
   nextBlock.startTime = time;
 
+  timer.timerState = TimerState.running;
+
   await timer.save();
 
   TimerEvent(
