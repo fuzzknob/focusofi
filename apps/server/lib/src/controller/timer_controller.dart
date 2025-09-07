@@ -76,6 +76,20 @@ Future<Response> skipBlock(Request req) async {
   return res.message('Break ended');
 }
 
+final updatePatternSchema = acanthis.object({'length': acanthis.number()});
+
+Future<Response> extendLength(Request req) async {
+  final user = getUserOrThrow(req);
+  final result = await validate(req, updatePatternSchema);
+
+  await timer_service.extendLength(
+    length: result['length'] as int,
+    userId: user.id!,
+  );
+
+  return res.message('Block length successfully extended');
+}
+
 DateTime _pDT(String result) => DateTime.parse(result);
 
 Router timerRoutes() {
@@ -86,5 +100,6 @@ Router timerRoutes() {
       .post('/reset', reset)
       .post('/pause', pause)
       .post('/resume', resume)
-      .post('/skip', skipBlock);
+      .post('/skip', skipBlock)
+      .post('/extend-length', extendLength);
 }

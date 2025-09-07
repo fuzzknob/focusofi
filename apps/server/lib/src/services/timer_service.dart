@@ -207,12 +207,8 @@ Future<Timer> skipBlock({required DateTime time, required int userId}) async {
   return timer;
 }
 
-Future<Timer> extendBlock({
-  required DateTime time,
-  required int extendTime,
-  required int userId,
-}) async {
-  final timer = await getTimer(userId, now: time);
+Future<Timer> extendLength({required int length, required int userId}) async {
+  final timer = await getTimer(userId);
 
   if (timer == null) {
     throw BadRequestException('There is no running timer');
@@ -222,13 +218,13 @@ Future<Timer> extendBlock({
 
   final currentBlock = sequence.blocks.firstWhere((block) => !block.completed);
 
-  currentBlock.length += extendTime;
+  currentBlock.length += length;
   sequence.modified = true;
 
   await timer.save();
 
   TimerEvent(
-    action: TimerAction.extendBlock,
+    action: TimerAction.extendLength,
     userId: userId,
     timer: timer,
   ).dispatch();

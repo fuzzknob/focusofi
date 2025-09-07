@@ -2,6 +2,7 @@
 import { TimerState, BlockType, Action } from '@/types'
 
 import Time from './components/Time.vue'
+import ExtendTime from './components/ExtendTime.vue'
 import Report from './components/Report.vue'
 
 const { timerState, currentBlock, startTimer, pauseTimer, resumeTimer, stopTimer, skipBlock } = useTimer()
@@ -12,7 +13,7 @@ const actionButtons = computed(() => {
   }
 
   if (timerState.value === TimerState.paused) {
-    return [Action.resume, Action.skip, Action.stop]
+    return [Action.resume, Action.skip, Action.stop, Action.extendLength]
   }
 
   if (timerState.value === TimerState.stopped) {
@@ -22,63 +23,70 @@ const actionButtons = computed(() => {
   const blockType = currentBlock.value!.type
 
   if (blockType === BlockType.longBreak || blockType === BlockType.shortBreak) {
-    return [Action.skip, Action.stop]
+    return [Action.pause, Action.skip, Action.stop, Action.extendLength]
   }
 
-  return [Action.pause, Action.skip, Action.stop]
+  return [Action.pause, Action.skip, Action.stop, Action.extendLength]
 })
 </script>
 
 <template>
-  <div>
-    <Time v-if="timerState !== TimerState.stopped" />
+  <div class="transition">
+    <Time
+      v-if="timerState !== TimerState.stopped"
+    />
     <Report v-else />
-    <div class="flex-center gap-6 text-3xl md:-mt-24 -mt-20">
-      <template
-        v-for="action in actionButtons"
-        :key="action"
-      >
-        <Button
-          v-if="action === Action.start"
-          class="px-5 py-1"
-          @click="startTimer"
+    <div class="flex flex-col gap-5 text-3xl md:-mt-24 -mt-20">
+      <div class="flex-center gap-4">
+        <template
+          v-for="action in actionButtons"
+          :key="action"
         >
-          START
-        </Button>
-
-        <Button
-          v-if="action === Action.skip"
-          class="flex items-center"
-          @click="skipBlock"
-        >
-          SKIP
-        </Button>
-
-        <Button
-          v-if="action === Action.pause"
-          class="px-5 py-1"
-          @click="pauseTimer"
-        >
-          PAUSE
-        </Button>
-
-        <Button
-          v-if="action === Action.resume"
-          class="px-5 py-1"
-          @click="resumeTimer"
-        >
-          RESUME
-        </Button>
-
-        <Button
-          v-if="action === Action.stop"
-          variant="danger"
-          class="px-5 py-1"
-          @click="stopTimer"
-        >
-          STOP
-        </Button>
-      </template>
+          <Button
+            v-if="action === Action.start"
+            class="px-5 py-1"
+            title="Start Timer"
+            @click="startTimer"
+          >
+            START
+          </Button>
+          <Icon
+            v-if="action === Action.stop"
+            name="ion:square-sharp"
+            size="35"
+            class="cursor-pointer hover:scale-110"
+            title="Stop Timer"
+            @click="stopTimer"
+          />
+          <Icon
+            v-if="action === Action.pause"
+            name="ion:md-pause"
+            size="40"
+            class="cursor-pointer hover:scale-110"
+            title="Pause Timer"
+            @click="pauseTimer"
+          />
+          <Icon
+            v-if="action === Action.resume"
+            name="ion:md-play"
+            size="40"
+            class="cursor-pointer hover:scale-110"
+            title="Resume Timer"
+            @click="resumeTimer"
+          />
+          <Icon
+            v-if="action === Action.skip"
+            name="ion:md-skip-forward"
+            size="40"
+            class="cursor-pointer hover:scale-110"
+            :title="currentBlock?.type === BlockType.work ? 'Skip Work' : 'Skip Break'"
+            @click="skipBlock"
+          />
+          <ExtendTime
+            v-if="action === Action.extendLength"
+          />
+        </template>
+      </div>
     </div>
   </div>
 </template>

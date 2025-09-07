@@ -19,6 +19,7 @@ export enum Action {
   endBreak = 'END_BREAK',
   skip = 'SKIP',
   resume = 'RESUME',
+  extendLength = 'EXTEND_LENGTH',
 }
 
 export type Block = {
@@ -50,6 +51,7 @@ export interface Settings {
   shortBreakLength: number
   longBreakLength: number
   workSessions: number
+  progressive: boolean
 }
 
 export interface User {

@@ -150,6 +150,17 @@ export const useTimer = () => {
     }
   }
 
+  async function extendLength(length: number) {
+    if (timerState.value !== TimerState.paused) return
+
+    currentBlock.value!.length += length
+    sequence.value.modified = true
+
+    if (user.value) {
+      await timerServer.extendLength(length)
+    }
+  }
+
   async function initTimerServer() {
     getNewSequence()
 
@@ -372,7 +383,7 @@ export const useTimer = () => {
     resetTimer,
     skipBlock,
     syncWithEvent,
-    // extendBlock,
+    extendLength,
 
     initTimerServer,
     initTimerClient,

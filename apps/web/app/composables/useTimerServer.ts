@@ -110,6 +110,20 @@ export const useTimerServer = () => {
     }
   }
 
+  async function extendLength(length: number) {
+    try {
+      await $api('/timer/extend-length', {
+        method: 'POST',
+        body: {
+          length,
+        },
+      })
+    }
+    catch (e) {
+      console.error(e)
+    }
+  }
+
   return {
     startTimer,
     stopTimer,
@@ -118,5 +132,6 @@ export const useTimerServer = () => {
     resumeTimer,
     fetchTimer,
     skipTimer,
+    extendLength,
   }
 }
