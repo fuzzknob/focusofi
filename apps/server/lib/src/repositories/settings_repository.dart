@@ -11,6 +11,7 @@ class SettingsRepository extends Repository<Settings> {
     required int longBreakLength,
     required int workSessions,
     required int userId,
+    required bool progressive,
   }) async {
     return save(
       Settings(
@@ -19,6 +20,7 @@ class SettingsRepository extends Repository<Settings> {
         longBreakLength: longBreakLength,
         workSessions: workSessions,
         userId: userId,
+        progressive: progressive,
       ),
     );
   }
@@ -32,6 +34,7 @@ class SettingsRepository extends Repository<Settings> {
       shortBreakLength: map['short_break_length'] as int,
       workLength: map['work_length'] as int,
       userId: map['user_id'] as int,
+      progressive: map['progressive'] != 0,
     );
   }
 
@@ -43,6 +46,7 @@ class SettingsRepository extends Repository<Settings> {
       'short_break_length': model.shortBreakLength,
       'work_length': model.workLength,
       'user_id': model.userId,
+      'progressive': model.progressive,
     };
   }
 }

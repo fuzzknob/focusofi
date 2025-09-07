@@ -18,6 +18,7 @@ final updateSettingsSchema = acanthis.object({
   'shortBreakLength': acanthis.number().integer().gte(10).lte(3600),
   'longBreakLength': acanthis.number().integer().gte(10).lte(3600),
   'workSessions': acanthis.number().integer().gte(2).lte(10),
+  'progressive': acanthis.boolean(),
 });
 
 Future<Response> update(Request req) async {
@@ -31,6 +32,7 @@ Future<Response> update(Request req) async {
     shortBreakLength: result['shortBreakLength'],
     longBreakLength: result['longBreakLength'],
     workSessions: result['workSessions'],
+    progressive: result['progressive'],
   );
 
   return res.message('Successfully saved settings');

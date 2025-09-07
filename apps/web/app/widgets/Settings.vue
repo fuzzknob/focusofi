@@ -16,6 +16,7 @@ const validationSchema = toTypedSchema(
     shortBreakMinutes: zod.number().int().min(1).max(60),
     longBreakMinutes: zod.number().int().min(1).max(60),
     workSessions: zod.number().int().min(2).max(10),
+    progresive: zod.boolean(),
   }),
 )
 
@@ -25,6 +26,7 @@ const { defineField, setValues, handleSubmit, errors, meta } = useForm({
     shortBreakMinutes: settings.value!.shortBreakLength / 60,
     longBreakMinutes: settings.value!.longBreakLength / 60,
     workSessions: settings.value!.workSessions,
+    progresive: settings.value!.progressive,
   },
   validationSchema,
 })
@@ -33,6 +35,7 @@ const [workMinutes, workMinutesProps] = defineField('workMinutes')
 const [shortBreakMinutes, shortBreakMinutesProps] = defineField('shortBreakMinutes')
 const [longBreakMinutes, longBreakMinutesProps] = defineField('longBreakMinutes')
 const [workSessions, workSessionsProps] = defineField('workSessions')
+const [progressive, progressiveProps] = defineField('progresive')
 
 const isSubmitting = ref(false)
 
@@ -48,6 +51,7 @@ watch(isOpen, () => {
     shortBreakMinutes: settings.value!.shortBreakLength / 60,
     longBreakMinutes: settings.value!.longBreakLength / 60,
     workSessions: settings.value!.workSessions,
+    progresive: settings.value!.progressive,
   })
 })
 
@@ -63,6 +67,7 @@ const handleSettingsSubmit = handleSubmit(async (values) => {
       longBreakLength: values.longBreakMinutes * 60,
       shortBreakLength: values.shortBreakMinutes * 60,
       workSessions: values.workSessions,
+      progressive: values.progresive,
     })
     isOpen.value = false
   }
@@ -83,9 +88,9 @@ const handleSettingsSubmit = handleSubmit(async (values) => {
       :disabled="isTimerRunning"
     >
       <Icon
-        name="memory:dot-octagon"
+        name="ion:md-settings"
         :class="{ 'text-gray-400': isTimerRunning }"
-        size="25"
+        size="27"
       />
     </DialogTrigger>
     <DialogPortal>
@@ -142,6 +147,12 @@ const handleSettingsSubmit = handleSubmit(async (values) => {
               :min="2"
               :max="10"
               :error="meta.touched ? errors.workSessions : ''"
+            />
+            <Switch
+              v-model="progressive"
+              v-bind="progressiveProps"
+              title="Experimental: Progressivly increases work time"
+              label="Progressive:"
             />
           </div>
           <div class="flex-center">

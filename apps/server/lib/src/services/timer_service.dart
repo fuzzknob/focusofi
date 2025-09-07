@@ -184,12 +184,14 @@ Future<Timer> skipBlock({required DateTime time, required int userId}) async {
   // Is the last in the sequence block
   if (nextBlock == null) {
     final settings = await settings_service.getSettingsOrThrow(userId);
+
+    timer.seqGenCount++;
+
     final newSequence = generateSequence(settings, timer.seqGenCount);
 
     timer.accumulatedBreak += timer.currentSequence.elapsedBreakLength;
     timer.accumulatedWork += timer.currentSequence.elapsedWorkLength;
     timer.currentSequence = newSequence;
-    timer.seqGenCount++;
 
     newSequence.startTime = time;
 
@@ -204,6 +206,35 @@ Future<Timer> skipBlock({required DateTime time, required int userId}) async {
 
   TimerEvent(
     action: TimerAction.skipBlock,
+    userId: userId,
+    timer: timer,
+  ).dispatch();
+
+  return timer;
+}
+
+Future<Timer> extendBlock({
+  required DateTime time,
+  required int extendTime,
+  required int userId,
+}) async {
+  final timer = await getTimer(userId, now: time);
+
+  if (timer == null) {
+    throw BadRequestException('There is no running timer');
+  }
+
+  final sequence = timer.currentSequence;
+
+  final currentBlock = sequence.blocks.firstWhere((block) => !block.completed);
+
+  currentBlock.length += extendTime;
+  sequence.modified = true;
+
+  await timer.save();
+
+  TimerEvent(
+    action: TimerAction.extendBlock,
     userId: userId,
     timer: timer,
   ).dispatch();
@@ -306,6 +337,10 @@ List<Block> syncBlocks(List<Block> blocks, DateTime now) {
 Sequence generateSequence(Settings settings, int seqGenCount) {
   final blocks = <Block>[];
 
+  if (settings.progressive && seqGenCount == 1) {
+    return progressiveSequence;
+  }
+
   for (var i = 1; i <= settings.workSessions; i++) {
     blocks.add(
       Block(
@@ -340,3 +375,19 @@ Sequence generateSequence(Settings settings, int seqGenCount) {
 
   return Sequence(blocks: blocks);
 }
+
+final progressiveSequence = Sequence(
+  blocks: [
+    Block(type: BlockType.work, length: 300),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 600),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 900),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 1200),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 1500),
+    Block(type: BlockType.longBreak, length: 900),
+  ],
+  modified: true,
+);

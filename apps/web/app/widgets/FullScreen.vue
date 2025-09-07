@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 const { isFullscreen, toggle } = useFullscreen()
-// const { f } = useMagicKeys()
+const { f } = useMagicKeys()
 
-// watch(f, () => {
-//   toggle()
-// })
+watch(f, () => {
+  toggle()
+})
 </script>
 
 <template>

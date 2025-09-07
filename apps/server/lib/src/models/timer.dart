@@ -240,13 +240,13 @@ class Block {
   Block({
     required this.type,
     required this.length,
-    required this.completed,
+    this.completed = false,
     this.elapsed = 0,
     this.startTime,
   });
 
   final BlockType type;
-  final int length;
+  int length;
   int elapsed;
   bool completed;
   DateTime? startTime;

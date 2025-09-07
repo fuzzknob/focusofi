@@ -11,6 +11,7 @@ Future<Settings> createSettings(
   int shortBreakLength = 120,
   int longBreakLength = 600,
   int workSessions = 4,
+  bool progressive = false,
 }) {
   return Settings.db.create(
     userId: userId,
@@ -18,6 +19,7 @@ Future<Settings> createSettings(
     shortBreakLength: shortBreakLength,
     longBreakLength: longBreakLength,
     workSessions: workSessions,
+    progressive: progressive,
   );
 }
 
@@ -27,6 +29,7 @@ Future<Settings> updateSettings(
   required int shortBreakLength,
   required int longBreakLength,
   required int workSessions,
+  required bool progressive,
 }) async {
   final settings = await getSettingsOrThrow(userId);
 
@@ -36,6 +39,7 @@ Future<Settings> updateSettings(
   settings.shortBreakLength = shortBreakLength;
   settings.longBreakLength = longBreakLength;
   settings.workSessions = workSessions;
+  settings.progressive = progressive;
 
   await settings.save();
 

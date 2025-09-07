@@ -4,11 +4,12 @@ import type { Settings } from '@/types'
 const SETTINGS_KEY = 'settings'
 
 export const useSettings = () => {
-  const settings = useState('settings', () => ({
+  const settings = useState<Settings>('settings', () => ({
     workLength: 2400,
     shortBreakLength: 120,
     longBreakLength: 600,
     workSessions: 3,
+    progressive: false,
   }))
   const user = useUser()
 

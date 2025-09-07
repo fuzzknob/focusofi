@@ -19,7 +19,7 @@ export const useTimer = () => {
   const blockIndex = useState<number>('block-index', () => -1)
   const accumulatedBreak = useState<number>('accumulated-break', () => 0)
   const accumulatedWork = useState<number>('accumulated-work', () => 0)
-  const seqGenCount = useState<number>('seq-gen-count', () => 0)
+  const seqGenCount = useState<number>('seq-gen-count', () => 1)
 
   const timeout = useState<NodeJS.Timeout | number | null>('timer-timeout', () => null)
   const expectedTimeout = useState<number | null>('timer-expected-timeout', () => null)
@@ -55,6 +55,8 @@ export const useTimer = () => {
   }
 
   async function pauseTimer() {
+    if (timerState.value !== TimerState.running) return
+
     clearTimer()
 
     timerState.value = TimerState.paused
@@ -70,6 +72,8 @@ export const useTimer = () => {
   }
 
   async function resumeTimer() {
+    if (timerState.value !== TimerState.paused) return
+
     const block = currentBlock.value!
 
     const resumeTime = new Date()
@@ -107,7 +111,7 @@ export const useTimer = () => {
     blockIndex.value = -1
     expectedTimeout.value = null
     timeout.value = null
-    seqGenCount.value = 0
+    seqGenCount.value = 1
     accumulatedWork.value = 0
     accumulatedBreak.value = 0
     sequence.value = {
@@ -208,7 +212,6 @@ export const useTimer = () => {
   }
 
   function stateTick(now: Date) {
-    console.log('tick tick')
     const block = currentBlock.value
     if (block == null) return
 
@@ -263,15 +266,39 @@ export const useTimer = () => {
 
   function getNewSequence() {
     const { blocks } = sequence.value
-    accumulatedBreak.value += blocks
-      .filter(block => [BlockType.shortBreak, BlockType.longBreak].includes(block.type))
-      .reduce((previous, block) => previous + block.elapsed, 0)
-    accumulatedWork.value += blocks
-      .filter(block => block.type === BlockType.work)
-      .reduce((previous, block) => previous + block.elapsed, 0)
 
-    sequence.value = generateSequence(settings.value!)
-    seqGenCount.value++
+    if (timerState.value !== TimerState.idle) {
+      accumulatedBreak.value += blocks
+        .filter(block => [BlockType.shortBreak, BlockType.longBreak].includes(block.type))
+        .reduce((previous, block) => previous + block.elapsed, 0)
+      accumulatedWork.value += blocks
+        .filter(block => block.type === BlockType.work)
+        .reduce((previous, block) => previous + block.elapsed, 0)
+
+      seqGenCount.value++
+    }
+
+    if (settings.value.progressive && seqGenCount.value <= 1) {
+      // progressive sequence
+      sequence.value = {
+        blocks: [
+          { type: BlockType.work, length: 300, completed: false, elapsed: 0 },
+          { type: BlockType.shortBreak, length: 300, completed: false, elapsed: 0 },
+          { type: BlockType.work, length: 600, completed: false, elapsed: 0 },
+          { type: BlockType.shortBreak, length: 300, completed: false, elapsed: 0 },
+          { type: BlockType.work, length: 900, completed: false, elapsed: 0 },
+          { type: BlockType.shortBreak, length: 300, completed: false, elapsed: 0 },
+          { type: BlockType.work, length: 1200, completed: false, elapsed: 0 },
+          { type: BlockType.shortBreak, length: 300, completed: false, elapsed: 0 },
+          { type: BlockType.work, length: 1500, completed: false, elapsed: 0 },
+          { type: BlockType.longBreak, length: 900, completed: false, elapsed: 0 },
+        ],
+        modified: true,
+      }
+    }
+    else {
+      sequence.value = generateSequence(settings.value!)
+    }
   }
 
   function clearTimer() {
@@ -283,24 +310,25 @@ export const useTimer = () => {
 
   // TODO: revamp this function
   function adjustTimerToSettings() {
-    const newSequence = generateSequence(settings.value!)
-    const current = currentBlock.value
+    getNewSequence()
+    // const newSequence = generateSequence(settings.value!)
+    // const current = currentBlock.value
 
-    if (current == null) {
-      sequence.value = newSequence
-      return
-    }
+    // if (current == null) {
+    //   sequence.value = newSequence
+    //   return
+    // }
 
-    let newIndex = 0
+    // let newIndex = 0
 
-    if ((blockIndex.value + 1) < newSequence.blocks.length) {
-      newIndex = blockIndex.value
-    }
+    // if ((blockIndex.value + 1) < newSequence.blocks.length) {
+    //   newIndex = blockIndex.value
+    // }
 
-    const block = newSequence.blocks[newIndex]!
-    block.startTime = current.startTime
-    currentBlock.value = block
-    stateTick(new Date())
+    // const block = newSequence.blocks[newIndex]!
+    // block.startTime = current.startTime
+    // currentBlock.value = block
+    // stateTick(new Date())
   }
 
   function syncWithEvent(event: SSEEvent) {
@@ -344,6 +372,7 @@ export const useTimer = () => {
     resetTimer,
     skipBlock,
     syncWithEvent,
+    // extendBlock,
 
     initTimerServer,
     initTimerClient,
