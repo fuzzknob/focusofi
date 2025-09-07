@@ -22,17 +22,11 @@ Future<Timer?> getTimer(int userId, {bool sync = true, DateTime? now}) async {
 
   final settings = await settings_service.getSettingsOrThrow(userId);
 
-  final watch = Stopwatch()..start();
-
   final currentTimer = syncTimer(
     timer: timer.copyWith(),
     settings: settings,
     now: now,
   );
-
-  watch.stop();
-
-  print('elapsed = ${watch.elapsedMilliseconds}ms');
 
   await currentTimer.save();
 
