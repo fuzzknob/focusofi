@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { padStart } from 'lodash'
-
 import { formatSecondsToTime } from '@/libs/utils'
 
 import { TimerState, BlockType } from '@/types'
@@ -30,8 +28,9 @@ const textColor = computed(() => {
 
 watch(time, () => {
   const { minutes, seconds } = formatSecondsToTime(time.value)
-  minutesHand.value = padStart(minutes.toString(), 2, 'O').replaceAll('0', 'O').split('')
-  secondsHand.value = padStart(seconds.toString(), 2, 'O').replaceAll('0', 'O').split('')
+
+  minutesHand.value = minutes.toString().padStart(2, 'O').replaceAll('0', 'O').split('')
+  secondsHand.value = seconds.toString().padStart(2, 'O').replaceAll('0', 'O').split('')
 }, {
   immediate: true,
 })

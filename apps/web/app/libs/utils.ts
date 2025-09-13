@@ -1,13 +1,3 @@
-import { random as rng } from 'lodash'
-
-export function uniqueRandomNumber(current: number, maxNumber: number) {
-  let randomNumber = current
-  while (randomNumber === current) {
-    randomNumber = rng(maxNumber)
-  }
-  return randomNumber
-}
-
 export function formatSecondsToTime(s: number) {
   let seconds = s
   let hours = 0

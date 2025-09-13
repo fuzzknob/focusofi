@@ -86,7 +86,7 @@ watch(isOpen, () => {
             <Button
               class="w-full"
               title="Extend by 5 minutes"
-              @click="() => handleChange(300)"
+              @click="() => handleChange(600)"
             >
               10 m
             </Button>
@@ -108,7 +108,10 @@ watch(isOpen, () => {
               :format-options="timeFormatOption"
               :error="meta.touched ? errors.customValue : ''"
             />
-            <Button :title="`Extend by ${customValue} minutes`">
+            <Button
+              type="submit"
+              :title="`Extend by ${customValue} minutes`"
+            >
               EXTEND
             </Button>
           </form>
