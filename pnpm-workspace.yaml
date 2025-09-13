@@ -1,5 +1,6 @@
 packages:
   - apps/web
+  - apps/web-old
 onlyBuiltDependencies:
   - "@parcel/watcher"
   - esbuild

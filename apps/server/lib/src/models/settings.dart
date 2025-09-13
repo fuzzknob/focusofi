@@ -8,8 +8,9 @@ class Settings implements Model {
     required this.workLength,
     required this.shortBreakLength,
     required this.longBreakLength,
-    required this.breakSuccessions,
+    required this.workSessions,
     required this.userId,
+    required this.progressive,
   });
 
   @override
@@ -18,8 +19,9 @@ class Settings implements Model {
   int workLength;
   int shortBreakLength;
   int longBreakLength;
-  int breakSuccessions;
+  int workSessions;
   int userId;
+  bool progressive;
 
   static SettingsRepository get db => SettingsRepository();
 
@@ -33,15 +35,17 @@ class Settings implements Model {
     int? workLength,
     int? shortBreakLength,
     int? longBreakLength,
-    int? breakSuccessions,
+    int? workSessions,
     int? userId,
+    bool? progressive,
   }) => Settings(
     id: id ?? this.id,
     workLength: workLength ?? this.workLength,
     shortBreakLength: shortBreakLength ?? this.shortBreakLength,
     longBreakLength: longBreakLength ?? this.longBreakLength,
-    breakSuccessions: breakSuccessions ?? this.breakSuccessions,
+    workSessions: workSessions ?? this.workSessions,
     userId: userId ?? this.userId,
+    progressive: progressive ?? this.progressive,
   );
 
   Map<String, Object?> toJson() {
@@ -49,7 +53,8 @@ class Settings implements Model {
       'workLength': workLength,
       'shortBreakLength': shortBreakLength,
       'longBreakLength': longBreakLength,
-      'breakSuccessions': breakSuccessions,
+      'workSessions': workSessions,
+      'progressive': progressive,
     };
   }
 }

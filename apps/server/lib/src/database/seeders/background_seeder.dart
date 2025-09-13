@@ -2,8 +2,8 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:dartx/dartx.dart';
-import 'package:pomo_server/src/models/background.dart';
-import 'package:pomo_server/src/libs/utils.dart';
+import 'package:focusofi/src/models/background.dart';
+import 'package:focusofi/src/libs/utils.dart';
 
 import 'seeder.dart';
 

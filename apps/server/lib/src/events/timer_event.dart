@@ -37,7 +37,8 @@ enum TimerAction {
   stop,
   pause,
   resume,
-  endBreak,
+  skipBlock,
+  extendLength,
   reset;
 
   String get value => toString();
@@ -49,8 +50,9 @@ enum TimerAction {
       (TimerAction.stop) => 'STOP',
       (TimerAction.pause) => 'PAUSE',
       (TimerAction.resume) => 'RESUME',
-      (TimerAction.endBreak) => 'END_BREAK',
+      (TimerAction.skipBlock) => 'SKIP_BLOCK',
       (TimerAction.reset) => 'RESET',
+      (TimerAction.extendLength) => 'EXTEND_LENGTH',
     };
   }
 
@@ -60,8 +62,9 @@ enum TimerAction {
       ('STOP') => TimerAction.stop,
       ('PAUSE') => TimerAction.pause,
       ('RESUME') => TimerAction.resume,
-      ('END_BREAK') => TimerAction.endBreak,
+      ('SKIP_BLOCK') => TimerAction.skipBlock,
       ('RESET') => TimerAction.reset,
+      ('EXTEND_LENGTH') => TimerAction.extendLength,
       _ => throw Exception('Unknown action => $action'),
     };
   }

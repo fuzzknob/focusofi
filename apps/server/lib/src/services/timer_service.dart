@@ -1,6 +1,7 @@
+import 'package:dartx/dartx.dart';
 import 'package:lucore/lucore.dart';
+import 'package:intl/intl.dart';
 
-import '../libs/utils.dart';
 import '../models/timer.dart';
 import '../models/settings.dart';
 import '../events/timer_event.dart';
@@ -8,37 +9,32 @@ import '../events/timer_event.dart';
 import 'settings_service.dart' as settings_service;
 import 'history_service.dart' as history_service;
 
-Future<Timer?> getTimer(int userId, {bool calculateCurrentState = true}) async {
+Future<Timer?> getTimer(int userId, {bool sync = true, DateTime? now}) async {
   final timer = await Timer.db.where('user_id', userId).first();
 
   if (timer == null) return null;
 
-  if (!calculateCurrentState) {
+  if (!sync) {
     return timer;
   }
 
+  if (timer.timerState != TimerState.running) return timer;
+
   final settings = await settings_service.getSettingsOrThrow(userId);
 
-  final currentTimer = calculateCurrentTimerStatus(
+  final currentTimer = syncTimer(
     timer: timer.copyWith(),
     settings: settings,
+    now: now,
   );
 
-  // save only if there is a change
-  if (currentTimer.status != timer.status ||
-      currentTimer.successionCount != timer.successionCount ||
-      currentTimer.startTime != timer.startTime) {
-    await currentTimer.save();
-  }
+  await currentTimer.save();
 
   return currentTimer;
 }
 
-Future<Timer> startTimer({
-  required DateTime startTime,
-  required int userId,
-}) async {
-  var timer = await getTimer(userId);
+Future<Timer> startTimer({required DateTime time, required int userId}) async {
+  var timer = await getTimer(userId, now: time);
 
   if (timer != null) {
     throw BadRequestException('Timer already started');
@@ -46,15 +42,18 @@ Future<Timer> startTimer({
 
   final settings = await settings_service.getSettingsOrThrow(userId);
 
+  final sequence = generateSequence(settings, 1);
+
+  sequence.startSequence(time);
+
   timer = await Timer.db.create(
-    startTime: startTime,
-    timerStartedAt: startTime,
+    startedAt: time,
     userId: userId,
-    successionCount: settings.breakSuccessions,
-    status: TimerStatus.working,
-    breakTillStatusChange: 0,
-    elapsedPrePause: 0,
-    workTillStatusChange: 0,
+    currentSequence: sequence,
+    timerState: TimerState.running,
+    seqGenCount: 1,
+    accumulatedBreak: 0,
+    accumulatedWork: 0,
   );
 
   TimerEvent(
@@ -66,30 +65,23 @@ Future<Timer> startTimer({
   return timer;
 }
 
-Future<Timer> stopTimer({
-  required int userId,
-  required DateTime endTime,
-  required int totalBreakTime,
-  required int totalWorkTime,
-}) async {
-  final timer = await getTimer(userId);
+Future<Timer> stopTimer({required int userId, required DateTime time}) async {
+  final timer = await getTimer(userId, now: time);
 
   if (timer == null) {
     throw BadRequestException('There is no running timer');
   }
 
-  timer.status = TimerStatus.stopped;
-  timer.breakTillStatusChange = totalBreakTime;
-  timer.workTillStatusChange = totalWorkTime;
+  timer.timerState = TimerState.stopped;
 
   await timer.save();
 
   await history_service.createHistory(
     name: '',
-    startTime: timer.timerStartedAt,
-    endTime: endTime,
-    totalWorkTime: totalWorkTime,
-    totalBreakTime: totalBreakTime,
+    startTime: timer.startedAt,
+    endTime: time,
+    totalBreakTime: timer.totalBreak,
+    totalWorkTime: timer.totalWork,
     userId: userId,
   );
 
@@ -99,7 +91,7 @@ Future<Timer> stopTimer({
 }
 
 Future<Timer> resetTimer({required int userId}) async {
-  final timer = await getTimer(userId, calculateCurrentState: false);
+  final timer = await getTimer(userId);
 
   if (timer == null) {
     throw BadRequestException('There is no running timer');
@@ -116,24 +108,14 @@ Future<Timer> resetTimer({required int userId}) async {
   return timer;
 }
 
-Future<Timer> pauseTimer({
-  required int userId,
-  required int elapsedPrePause,
-  required int successionCount,
-  required int totalWorkTime,
-  required int totalBreakTime,
-}) async {
-  final timer = await getTimer(userId, calculateCurrentState: false);
+Future<Timer> pauseTimer({required int userId, required DateTime time}) async {
+  final timer = await getTimer(userId, now: time);
 
   if (timer == null) {
     throw BadRequestException('There is no running timer');
   }
 
-  timer.status = TimerStatus.paused;
-  timer.elapsedPrePause = elapsedPrePause;
-  timer.successionCount = successionCount;
-  timer.workTillStatusChange = totalWorkTime;
-  timer.breakTillStatusChange = totalBreakTime;
+  timer.timerState = TimerState.paused;
 
   await timer.save();
 
@@ -146,19 +128,24 @@ Future<Timer> pauseTimer({
   return timer;
 }
 
-Future<Timer> resumeTimer({
-  required DateTime startTime,
-  required int userId,
-}) async {
-  final timer = await getTimer(userId, calculateCurrentState: false);
+Future<Timer> resumeTimer({required DateTime time, required int userId}) async {
+  final timer = await getTimer(userId);
 
   if (timer == null) {
     throw BadRequestException('There is no running timer');
   }
 
-  timer.startTime = startTime;
-  timer.status = TimerStatus.working;
-  timer.elapsedPrePause = 0;
+  if (timer.timerState != TimerState.paused) {
+    throw BadRequestException('Timer is not paused');
+  }
+
+  timer.timerState = TimerState.running;
+
+  final block = timer.currentSequence.blocks.firstWhere(
+    (block) => !block.completed,
+  );
+
+  block.startTime = time.subtract(Duration(seconds: block.elapsed));
 
   await timer.save();
 
@@ -171,29 +158,48 @@ Future<Timer> resumeTimer({
   return timer;
 }
 
-Future<Timer> endBreak({
-  required int userId,
-  required DateTime startTime,
-  required int successionCount,
-  required int totalWorkTime,
-  required int totalBreakTime,
-}) async {
-  final timer = await getTimer(userId, calculateCurrentState: false);
+Future<Timer> skipBlock({required DateTime time, required int userId}) async {
+  final timer = await getTimer(userId, now: time);
 
   if (timer == null) {
     throw BadRequestException('There is no running timer');
   }
 
-  timer.status = TimerStatus.working;
-  timer.startTime = startTime;
-  timer.successionCount = successionCount;
-  timer.workTillStatusChange = totalWorkTime;
-  timer.breakTillStatusChange = totalBreakTime;
+  final currentBlock = timer.currentSequence.blocks.firstWhere(
+    (block) => !block.completed,
+  );
+
+  currentBlock.completed = true;
+
+  var nextBlock = timer.currentSequence.blocks.firstOrNullWhere(
+    (block) => !block.completed,
+  );
+
+  // Is the last in the sequence block
+  if (nextBlock == null) {
+    final settings = await settings_service.getSettingsOrThrow(userId);
+
+    timer.seqGenCount++;
+
+    final newSequence = generateSequence(settings, timer.seqGenCount);
+
+    timer.accumulatedBreak += timer.currentSequence.elapsedBreakLength;
+    timer.accumulatedWork += timer.currentSequence.elapsedWorkLength;
+    timer.currentSequence = newSequence;
+
+    newSequence.startTime = time;
+
+    nextBlock = newSequence.blocks.first;
+  }
+
+  nextBlock.startTime = time;
+
+  timer.timerState = TimerState.running;
 
   await timer.save();
 
   TimerEvent(
-    action: TimerAction.endBreak,
+    action: TimerAction.skipBlock,
     userId: userId,
     timer: timer,
   ).dispatch();
@@ -201,158 +207,177 @@ Future<Timer> endBreak({
   return timer;
 }
 
-Future<Timer?> adjustTimerToNewSettings(
-  int userId,
-  Settings settings,
-  Settings oldSettings,
-) async {
-  Timer? timer = await getTimer(userId, calculateCurrentState: false);
+Future<Timer> extendLength({required int length, required int userId}) async {
+  final timer = await getTimer(userId);
 
-  if (timer == null) return null;
-
-  // if it is not one of the following status then return
-  if (![
-    TimerStatus.working,
-    TimerStatus.shortBreak,
-    TimerStatus.longBreak,
-    TimerStatus.paused,
-  ].contains(timer.status)) {
-    return timer;
+  if (timer == null) {
+    throw BadRequestException('There is no running timer');
   }
 
-  final now = DateTime.now();
+  final sequence = timer.currentSequence;
 
-  timer = calculateCurrentTimerStatus(
+  final currentBlock = sequence.blocks.firstWhere((block) => !block.completed);
+
+  currentBlock.length += length;
+  sequence.modified = true;
+
+  await timer.save();
+
+  TimerEvent(
+    action: TimerAction.extendLength,
+    userId: userId,
     timer: timer,
-    settings: oldSettings,
-    now: now,
-  );
+  ).dispatch();
 
-  final timePassed = now.difference(timer.startTime);
-
-  if (settings.breakSuccessions != oldSettings.breakSuccessions) {
-    final index = oldSettings.breakSuccessions - timer.successionCount;
-    timer.successionCount = settings.breakSuccessions - index;
-  }
-
-  if (timer.successionCount <= 0) {
-    timer.successionCount = settings.breakSuccessions;
-
-    if ([
-      TimerStatus.shortBreak,
-      TimerStatus.longBreak,
-    ].contains(timer.status)) {
-      timer.breakTillStatusChange += timePassed.inSeconds;
-    } else {
-      timer.workTillStatusChange += timePassed.inSeconds;
-    }
-
-    if (timer.status == TimerStatus.paused) {
-      timer.elapsedPrePause = 0;
-      return timer.save();
-    }
-
-    timer.startTime = now;
-    timer.status = TimerStatus.working;
-
-    return timer.save();
-  }
-
-  if (timer.status == TimerStatus.paused) {
-    return timer.save();
-  }
-
-  final statusLength = getStatusLength(timer.status, settings);
-  final timerCount = statusLength - timePassed.inSeconds;
-
-  if (timerCount >= 0) {
-    return timer.save();
-  }
-
-  timer.startTime = now;
-
-  if ([TimerStatus.shortBreak, TimerStatus.longBreak].contains(timer.status)) {
-    timer.status = TimerStatus.working;
-    timer.breakTillStatusChange += timePassed.inSeconds;
-
-    return timer.save();
-  }
-
-  if (timer.successionCount <= 1) {
-    timer.status = TimerStatus.longBreak;
-    timer.successionCount = settings.breakSuccessions;
-  } else {
-    timer.status = TimerStatus.shortBreak;
-    timer.successionCount -= 1;
-  }
-
-  timer.workTillStatusChange += timePassed.inSeconds;
-
-  return timer.save();
+  return timer;
 }
 
-Timer calculateCurrentTimerStatus({
+String formatPrint(DateTime date) {
+  final formatter = DateFormat('dd/MM/yyyy HH:mm:ss');
+  return formatter.format(date);
+}
+
+Timer syncTimer({
   required Timer timer,
   required Settings settings,
   DateTime? now,
 }) {
   now ??= DateTime.now();
+  var sequence = timer.currentSequence;
 
-  while (true) {
-    if (timer.status == TimerStatus.working) {
-      final statusEndTime = timer.startTime.add(
-        Duration(seconds: settings.workLength),
-      );
+  do {
+    final endTime = sequence.endTime;
 
-      if (statusEndTime.isBefore(now)) {
-        if (timer.successionCount <= 1) {
-          timer.status = TimerStatus.longBreak;
-          timer.successionCount = settings.breakSuccessions;
-        } else {
-          timer.status = TimerStatus.shortBreak;
-          timer.successionCount -= 1;
-        }
+    if (endTime.isAfter(now)) {
+      sequence.blocks = syncBlocks(sequence.blocks, now);
+      timer.currentSequence = sequence;
 
-        timer.workTillStatusChange += settings.workLength;
-        timer.startTime = statusEndTime;
-
-        continue;
-      }
-
-      timer.workTillStatusChange +=
-          settings.workLength - statusEndTime.difference(now).inSeconds;
-    } else if (timer.status == TimerStatus.shortBreak) {
-      final statusEndTime = timer.startTime.add(
-        Duration(seconds: settings.shortBreakLength),
-      );
-
-      if (statusEndTime.isBefore(now)) {
-        timer.status = TimerStatus.working;
-        timer.startTime = statusEndTime;
-        timer.breakTillStatusChange += settings.shortBreakLength;
-
-        continue;
-      }
-
-      timer.breakTillStatusChange =
-          settings.shortBreakLength - statusEndTime.difference(now).inSeconds;
-    } else if (timer.status == TimerStatus.longBreak) {
-      final statusEndTime = timer.startTime.add(
-        Duration(seconds: settings.longBreakLength),
-      );
-
-      if (statusEndTime.isBefore(now)) {
-        timer.status = TimerStatus.working;
-        timer.startTime = statusEndTime;
-        timer.breakTillStatusChange += settings.longBreakLength;
-
-        continue;
-      }
-
-      timer.breakTillStatusChange +=
-          settings.longBreakLength - statusEndTime.difference(now).inSeconds;
+      return timer;
     }
 
-    return timer;
+    timer.seqGenCount++;
+    timer.accumulatedBreak += sequence.breakLength;
+    timer.accumulatedWork += sequence.workLength;
+    sequence = generateSequence(settings, timer.seqGenCount);
+
+    sequence.startSequence(endTime);
+  } while (sequence.modified);
+
+  final totalPastTime = now.difference(sequence.startTime!);
+
+  final sessionCount = (totalPastTime.inSeconds / sequence.totalLength).floor();
+
+  if (sessionCount > 0) {
+    timer.seqGenCount += sessionCount;
+    timer.accumulatedBreak += sequence.breakLength * sessionCount;
+    timer.accumulatedWork += sequence.workLength * sessionCount;
+
+    final startTime = sequence.startTime!.add(
+      Duration(seconds: sequence.totalLength * sessionCount),
+    );
+
+    sequence = generateSequence(settings, timer.seqGenCount);
+
+    sequence.startSequence(startTime);
   }
+
+  sequence.blocks = syncBlocks(sequence.blocks, now);
+  timer.currentSequence = sequence;
+
+  return timer;
 }
+
+List<Block> syncBlocks(List<Block> blocks, DateTime now) {
+  DateTime? lastBlockEndTime;
+
+  for (final block in blocks) {
+    final startTime = block.startTime ?? lastBlockEndTime!;
+
+    if (startTime.isAfter(now)) {
+      throw Exception('Block starts after "now"');
+    }
+
+    block.startTime = startTime;
+
+    final blockEndTime = startTime.add(Duration(seconds: block.length));
+
+    lastBlockEndTime = blockEndTime;
+
+    // Just so we don't overwrite skipped block's elapsed time
+    if (block.completed) {
+      continue;
+    }
+
+    if (blockEndTime.isBefore(now)) {
+      block.completed = true;
+      block.elapsed = block.length;
+
+      continue;
+    }
+
+    // Copying frontend
+    block.elapsed = (now.difference(startTime).inMilliseconds / 1000).round();
+
+    return blocks;
+  }
+
+  throw Exception('Blocks out of range');
+}
+
+Sequence generateSequence(Settings settings, int seqGenCount) {
+  final blocks = <Block>[];
+
+  if (settings.progressive && seqGenCount == 1) {
+    return progressiveSequence;
+  }
+
+  for (var i = 1; i <= settings.workSessions; i++) {
+    blocks.add(
+      Block(
+        type: BlockType.work,
+        length: settings.workLength,
+        elapsed: 0,
+        completed: false,
+      ),
+    );
+
+    if (i < settings.workSessions) {
+      blocks.add(
+        Block(
+          type: BlockType.shortBreak,
+          length: settings.shortBreakLength,
+          elapsed: 0,
+          completed: false,
+        ),
+      );
+      continue;
+    }
+
+    blocks.add(
+      Block(
+        type: BlockType.longBreak,
+        length: settings.longBreakLength,
+        elapsed: 0,
+        completed: false,
+      ),
+    );
+  }
+
+  return Sequence(blocks: blocks);
+}
+
+final progressiveSequence = Sequence(
+  blocks: [
+    Block(type: BlockType.work, length: 300),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 600),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 900),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 1200),
+    Block(type: BlockType.shortBreak, length: 300),
+    Block(type: BlockType.work, length: 1500),
+    Block(type: BlockType.longBreak, length: 900),
+  ],
+  modified: true,
+);

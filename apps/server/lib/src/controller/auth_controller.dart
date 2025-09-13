@@ -1,6 +1,6 @@
 import 'package:lucore/lucore.dart';
 import 'package:acanthis/acanthis.dart' as acanthis;
-import 'package:pomo_server/src/middlewares/auth_middlwares.dart';
+import 'package:focusofi/src/middlewares/auth_middlwares.dart';
 
 import '../libs/utils.dart';
 import '../services/auth_service.dart' as auth_service;
@@ -40,6 +40,8 @@ Future<Response> loginWithOtp(Request req) async {
 
   final hostUrl = getEnv('BASE_HOST_URL')!;
 
+  final user = await session.user();
+
   return res
       .signedCookie(
         'authorization',
@@ -48,7 +50,7 @@ Future<Response> loginWithOtp(Request req) async {
         domain: hostUrl,
         sameSite: SameSite.none,
       )
-      .message('Successfully logged in');
+      .json(user?.toJson());
 }
 
 Future<Response> logout(Request req) async {
