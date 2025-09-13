@@ -44,4 +44,4 @@ jobs:
         id: deploy
         with:
           project-key: pomo-kdzz
-          directory: apps/web/dist
+          directory: apps/web/.output
