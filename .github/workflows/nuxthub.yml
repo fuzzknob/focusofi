@@ -11,9 +11,6 @@ jobs:
   deploy:
     name: "Deploy to NuxtHub"
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-      url: ${{ steps.deploy.outputs.deployment-url }}
     permissions:
       contents: read
       id-token: write
@@ -36,12 +33,8 @@ jobs:
       - name: Ensure NuxtHub module is installed
         run: pnpx nuxthub@latest ensure
 
-      - name: Build application
-        run: pnpm web:build
-
       - name: Deploy to NuxtHub
         uses: nuxt-hub/action@v2
-        id: deploy
         with:
           project-key: pomo-kdzz
-          directory: apps/web/.output
+          directory: apps/web
