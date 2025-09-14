@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxt/icon',
     'reka-ui/nuxt',
+    '@nuxthub/core',
   ],
   devtools: { enabled: true },
   css: ['./app/global.css'],
