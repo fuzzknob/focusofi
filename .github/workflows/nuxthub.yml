@@ -38,3 +38,4 @@ jobs:
         with:
           project-key: pomo-kdzz
           directory: apps/web
+          output-directory: .output
