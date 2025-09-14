@@ -36,6 +36,5 @@ jobs:
       - name: Deploy to NuxtHub
         uses: nuxt-hub/action@v2
         with:
-          project-key: pomo-kdzz
+          project-key: focusofi-yjal
           directory: apps/web
-          output-directory: .output
