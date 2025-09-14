@@ -38,3 +38,4 @@ jobs:
         with:
           project-key: focusofi-yjal
           directory: apps/web
+          output-directory: .output
