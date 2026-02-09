@@ -96,3 +96,21 @@ Future<User> validateToken(String token) async {
 
   return user;
 }
+
+Future<(bool hasRefreshed, String token)> refreshToken(int userId) async {
+  final currentSession = (await Session.db.where('user_id', userId).first())!;
+
+  final expirationGrayZone = currentSession.expiration.subtract(
+    Duration(days: 7),
+  );
+
+  if (expirationGrayZone.isAfter(DateTime.now())) {
+    return (false, currentSession.token);
+  }
+
+  final newSession = await createSession(userId);
+
+  await currentSession.delete();
+
+  return (true, newSession.token);
+}

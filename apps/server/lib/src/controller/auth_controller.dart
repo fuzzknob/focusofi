@@ -46,7 +46,7 @@ Future<Response> loginWithOtp(Request req) async {
       .signedCookie(
         'authorization',
         'Bearer ${session.token}',
-        expires: DateTime.now().add(Duration(days: 30)),
+        expires: DateTime.now().add(Duration(days: 30 * 30)),
         domain: hostUrl,
         sameSite: SameSite.none,
       )
@@ -67,6 +67,23 @@ Future<Response> logout(Request req) async {
 
 Future<Response> me(Request req) async {
   final user = getUserOrThrow(req);
+
+  final (hasRefreshed, token) = await auth_service.refreshToken(user.id!);
+
+  if (hasRefreshed) {
+    final hostUrl = getEnv('BASE_HOST_URL')!;
+
+    return res
+        .signedCookie(
+          'authorization',
+          'Bearer $token',
+          expires: DateTime.now().add(Duration(days: 30 * 30)),
+          domain: hostUrl,
+          sameSite: SameSite.none,
+        )
+        .json(user.toJson());
+  }
+
   return res.json(user.toJson());
 }
 
