@@ -2,30 +2,19 @@
   "languages": {
     "JavaScript": {
       "formatter": {
-        "code_actions": {
-          "source.fixAll.eslint": true
-        }
-      }
+        "code_action": "source.fixAll.eslint",
+      },
     },
     "Vue.js": {
       "formatter": {
-        "code_actions": {
-          "source.fixAll.eslint": true
-        }
+        "code_action": "source.fixAll.eslint",
       },
-      "code_actions_on_format": {
-        "source.fixAll.eslint": true
-      }
     },
     "TypeScript": {
       "formatter": {
-        "code_actions": {
-          "source.fixAll.eslint": true
-        }
+        "code_action": "source.fixAll.eslint",
       },
-      "code_actions_on_format": {
-        "source.fixAll.eslint": true
-      }
-    }
-  }
+    },
+  },
+  "format_on_save": "on",
 }
