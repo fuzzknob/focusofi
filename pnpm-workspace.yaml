@@ -1,6 +1,11 @@
 packages:
   - apps/web
   - apps/web-old
+allowBuilds:
+  '@parcel/watcher': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  vue-demi: true
 onlyBuiltDependencies:
   - "@parcel/watcher"
   - esbuild

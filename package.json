@@ -10,5 +10,5 @@
     "server:seed": "dart apps/server/bin/focusofi.dart seed",
     "server:build": "dart compile exe apps/server/bin/focusofi.dart -o ./build/focusofi"
   },
-  "packageManager": "pnpm@10.6.0"
+  "packageManager": "pnpm@11.5.0"
 }
