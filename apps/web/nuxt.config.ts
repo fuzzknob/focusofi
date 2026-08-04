@@ -1,10 +1,10 @@
 import { defineNuxtConfig } from 'nuxt/config'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxtjs/tailwindcss',
     '@nuxt/fonts',
     '@vueuse/nuxt',
     '@nuxt/icon',
@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     '@nuxthub/core',
   ],
   devtools: { enabled: true },
-  css: ['./app/global.css'],
+  css: ['~/global.css'],
   runtimeConfig: {
     public: {
       apiBase: '',
@@ -20,18 +20,16 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: '2025-07-15',
+  vite: {
+    plugins: [tailwindcss()],
+  },
   eslint: {
     config: {
       stylistic: true,
     },
   },
-  tailwindcss: {
-    config: {
-      content: {
-        files: [
-          'app/**/*.vue',
-        ],
-      },
-    },
+  icon: {
+    mode: 'css',
+    cssLayer: 'base',
   },
 })

@@ -8,6 +8,7 @@ import '../libs/utils.dart';
 
 import 'user_service.dart' as user_service;
 import 'settings_service.dart' as settings_service;
+import 'email_service.dart' as email_service;
 
 Future<EmailOtp> createEmailOtp(
   int userId, {
@@ -43,8 +44,7 @@ Future<void> requestLogin(String email) async {
 
   final emailOtp = await createEmailOtp(user.id!);
 
-  // TODO: send the otp code to the user
-  print(emailOtp.otpCode);
+  await email_service.sendOtpEmail(email, otp: emailOtp.otpCode);
 }
 
 Future<Session> loginWithOtp(String otpCode) async {
