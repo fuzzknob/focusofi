@@ -17,6 +17,9 @@ services:
       - FRONT_END_URL=${FRONT_END_URL}
       - BASE_HOST_URL=${BASE_HOST_URL}
       - COOKIE_SECRET=${COOKIE_SECRET}
+      - RESEND_KEY=${RESEND_KEY}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ADMIN_EMAILS=${ADMIN_EMAILS}
     volumes:
       - ${SERVER_DATABASE_DIRECTORY}:/data
     networks:
