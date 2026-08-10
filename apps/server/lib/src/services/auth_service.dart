@@ -44,7 +44,7 @@ Future<void> requestLogin(String email) async {
 
   final emailOtp = await createEmailOtp(user.id!);
 
-  await email_service.sendOtpEmail(email, otp: emailOtp.otpCode);
+  email_service.sendOtpEmail(email, otp: emailOtp.otpCode);
 }
 
 Future<Session> loginWithOtp(String otpCode) async {
