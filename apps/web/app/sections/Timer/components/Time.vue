@@ -38,34 +38,34 @@ watch(time, () => {
 
 <template>
   <div>
-    <div class="md:-mb-28 -mb-20 flex justify-center">
-      <div class="flex items-end text-2xl">
+    <div class="md:-mb-38 -mb-20 flex justify-center">
+      <div class="flex items-end text-2xl md:text-3xl">
         <template
           v-for="(block, index) in sequence.blocks"
           :key="index"
         >
           <div
             v-if="block.type === BlockType.work"
-            class="h-8 w-9 border-4 border-r-0 border-white flex-center"
+            class="h-8 w-9 md:h-10 md:w-11 border-4 border-r-0 border-white flex-center"
             :class="{ 'border-l-0': index > 0, 'bg-white text-black': index === blockIndex }"
           >
             W
           </div>
           <div
             v-else-if="block.type === BlockType.shortBreak"
-            class="h-10 border-4 border-white flex items-end"
+            class="h-10 md:h-12 border-4 border-white flex items-end"
             :class="{ 'bg-white text-black': index === blockIndex }"
           >
-            <div class="flex-center w-7 h-6">
+            <div class="flex-center w-7 h-6 md:w-9 md:h-8">
               S
             </div>
           </div>
           <div
             v-else
-            class="h-10 border-4 border-white flex items-end"
+            class="h-10 md:h-12 border-4 border-white flex items-end"
             :class="{ 'bg-white text-black': index === blockIndex }"
           >
-            <div class="flex-center w-7 h-6">
+            <div class="flex-center w-7 h-6 md:w-9 md:h-8">
               L
             </div>
           </div>
@@ -73,14 +73,14 @@ watch(time, () => {
       </div>
     </div>
     <div
-      class="flex items-center text-[13rem] md:text-[19rem]"
+      class="flex items-center text-[13rem] md:text-[25rem]"
       :class="textColor"
     >
       <div class="flex">
-        <div class="w-[90px] md:w-[135px] text-end">
+        <div class="w-[90px] md:w-[175px] text-end">
           {{ minutesHand[0] }}
         </div>
-        <div class="w-[90px] md:w-[135px] text-end">
+        <div class="w-[90px] md:w-[175px] text-end">
           {{ minutesHand[1] }}
         </div>
       </div>
@@ -88,10 +88,10 @@ watch(time, () => {
         <span :class="{ 'opacity-0': !separatorVisible }">:</span>
       </div>
       <div class="flex">
-        <div class="w-[90px] md:w-[135px] text-end">
+        <div class="w-[90px] md:w-[175px] text-end">
           {{ secondsHand[0] }}
         </div>
-        <div class="w-[90px] md:w-[135px] text-end">
+        <div class="w-[90px] md:w-[175px] text-end">
           {{ secondsHand[1] }}
         </div>
       </div>
