@@ -36,7 +36,7 @@ const actionButtons = computed(() => {
       v-if="timerState !== TimerState.stopped"
     />
     <Report v-else />
-    <div class="flex flex-col gap-5 text-3xl md:-mt-24 -mt-20">
+    <div class="flex flex-col gap-5 text-3xl md:-mt-38 -mt-20">
       <div class="flex-center gap-4">
         <template
           v-for="action in actionButtons"
@@ -53,7 +53,7 @@ const actionButtons = computed(() => {
           <Icon
             v-if="action === Action.stop"
             name="ion:square-sharp"
-            size="35"
+            size="40"
             class="cursor-pointer hover:scale-110"
             title="Stop Timer"
             @click="stopTimer"
@@ -61,7 +61,7 @@ const actionButtons = computed(() => {
           <Icon
             v-if="action === Action.pause"
             name="ion:md-pause"
-            size="40"
+            size="45"
             class="cursor-pointer hover:scale-110"
             title="Pause Timer"
             @click="pauseTimer"
@@ -69,7 +69,7 @@ const actionButtons = computed(() => {
           <Icon
             v-if="action === Action.resume"
             name="ion:md-play"
-            size="40"
+            size="45"
             class="cursor-pointer hover:scale-110"
             title="Resume Timer"
             @click="resumeTimer"
@@ -77,7 +77,7 @@ const actionButtons = computed(() => {
           <Icon
             v-if="action === Action.skip"
             name="ion:md-skip-forward"
-            size="40"
+            size="45"
             class="cursor-pointer hover:scale-110"
             :title="currentBlock?.type === BlockType.work ? 'Skip Work' : 'Skip Break'"
             @click="skipBlock"
