@@ -8,13 +8,25 @@ export const useNotification = () => {
   function playAudio(name: string) {
     if (notificationEnabled.value.mute) return
 
-    const audio = new Audio(`assets/sounds/${name}`)
+    const audio = document.getElementById('notification-player') as HTMLAudioElement
+
+    audio.src = `assets/sounds/${name}`
+
     audio.volume = 0.5
+
     audio.play()
   }
 
   function toggleMute() {
     notificationEnabled.value.mute = !notificationEnabled.value.mute
+
+    const audio = document.getElementById('notification-player') as HTMLAudioElement
+
+    if (notificationEnabled.value.mute) {
+      audio.volume = 0
+    } else {
+      audio.volume = 0.5
+    }
   }
 
   function notifyLongBreak() {

@@ -33,6 +33,12 @@ useHead({
     <TopLeftWidgets />
     <TopRightWidgets />
 
+    <audio
+      id="notification-player"
+      class="hidden"
+      src="assets/sounds/short_break.mp3"
+    />
+
     <div class="absolute flex flex-col">
       <Timer />
     </div>
